@@ -1,0 +1,112 @@
+# before u read this i kind of skipped some steps bc i am also a cs major and i have used grep before lol
+
+# copy exercise into my folder and rename it to match worksheet
+[harel.z@explorer-02]/courses/BIOL2406.202710% cp misc/grep_exercise.txt students/harel.z/inclass
+[harel.z@explorer-02]/courses/BIOL2406.202710% cd students/harel.z/inclass 
+[harel.z@explorer-02]/courses/BIOL2406.202710/students/harel.z/inclass% mv grep_exercise.txt sequences.fasta
+
+# verify #3 output 
+[harel.z@explorer-02]/courses/BIOL2406.202710/students/harel.z/inclass% grep "GAATTC" sequences.fasta
+ATGGCTAGCTAGGGATCCGAATTCGCGCTAGC
+ATGCCCGGGAATTCGATCGATCGGGCCATGCA
+NNNATGGCTAGCTAGGATCCGAATTCGCGATG
+
+# lmao oops i forgot to be in a compute node
+[harel.z@explorer-02]/courses/BIOL2406.202710/students/harel.z/inclass% srun --pty /bin/zsh 
+srun: job 10582063 queued and waiting for resources
+srun: job 10582063 has been allocated resources
+
+# do #3 but with -A instead of -B
+[harel.z@c0637]/courses/BIOL2406.202710/students/harel.z/inclass% grep -A 1 "GAATTC" sequences.fasta
+ATGGCTAGCTAGGGATCCGAATTCGCGCTAGC
+>seq2_mutant
+--
+ATGCCCGGGAATTCGATCGATCGGGCCATGCA
+>seq4_control
+NNNATGGCTAGCTAGGATCCGAATTCGCGATG
+
+# do -3 using -B so I can see what sequence header it finds
+[harel.z@c0637]/courses/BIOL2406.202710/students/harel.z/inclass% grep -B 1 "GAATTC" sequences.fasta
+>seq1_wildtype
+ATGGCTAGCTAGGGATCCGAATTCGCGCTAGC
+--
+>seq3_wildtype
+ATGCCCGGGAATTCGATCGATCGGGCCATGCA
+>seq4_control
+NNNATGGCTAGCTAGGATCCGAATTCGCGATG
+
+# do #4 using -B so I can see what sequence header it finds
+[harel.z@c0637]/courses/BIOL2406.202710/students/harel.z/inclass% grep -B 1 "GATCC" sequences.fasta
+>seq1_wildtype
+ATGGCTAGCTAGGGATCCGAATTCGCGCTAGC
+>seq2_mutant
+ATGGCTAGCTAGGGATCCTAATTCGCGCTAGC
+--
+>seq4_control
+NNNATGGCTAGCTAGGATCCGAATTCGCGATG
+
+# do #5
+[harel.z@c0637]/courses/BIOL2406.202710/students/harel.z/inclass% grep -v "GAATTC" sequences.fasta
+>seq1_wildtype
+>seq2_mutant
+ATGGCTAGCTAGGGATCCTAATTCGCGCTAGC
+>seq3_wildtype
+>seq4_control
+
+# do #6 and #7 
+[harel.z@c0637]/courses/BIOL2406.202710/students/harel.z/inclass% grep "N" sequences.fasta
+NNNATGGCTAGCTAGGATCCGAATTCGCGATG
+[harel.z@c0637]/courses/BIOL2406.202710/students/harel.z/inclass% grep -n "N" sequences.fasta
+8:NNNATGGCTAGCTAGGATCCGAATTCGCGATG
+[harel.z@c0637]/courses/BIOL2406.202710/students/harel.z/inclass% grep -n -b 1 "N" sequences.fasta
+grep: N: No such file or directory
+sequences.fasta:1:0:>seq1_wildtype
+[harel.z@c0637]/courses/BIOL2406.202710/students/harel.z/inclass% grep -n -B 1 "N" sequences.fasta
+7->seq4_control
+8:NNNATGGCTAGCTAGGATCCGAATTCGCGATG
+
+# do #12
+[harel.z@c0637]/courses/BIOL2406.202710/students/harel.z/inclass% grep -o "G" sequences.fasta
+G
+G
+G
+G
+G
+G
+G
+G
+G
+G
+G
+G
+G
+G
+G
+G
+G
+G
+G
+G
+G
+G
+G
+G
+G
+G
+G
+G
+G
+G
+G
+G
+G
+G
+G
+G
+G
+G
+[harel.z@c0637]/courses/BIOL2406.202710/students/harel.z/inclass% grep -o "G" sequences.fasta | wc -l
+38
+[harel.z@c0637]/courses/BIOL2406.202710/students/harel.z/inclass% 
+
+
