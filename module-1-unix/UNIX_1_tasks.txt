@@ -1,0 +1,352 @@
+# 1_UNIX.md - Tasks 1-23
+# Zach Harel
+# Saved terminal session (bash 3.2, macOS) with comments added.
+# Long outputs are piped through head so only the first 10 lines show.
+
+# ==== Task 1: go to the home directory and list its contents ====
+
+# | head keeps only the first 10 lines of output
+Zachs-MacBook-Pro-2:~ zach$ cd ~
+Zachs-MacBook-Pro-2:~ zach$ ls | head
+Applications
+CLionProjects
+CS1200
+cs3200-harel
+cubesat
+DataGripProjects
+Desktop
+Documents
+Downloads
+go
+
+# ==== Task 2: move between directories at the same level ====
+Zachs-MacBook-Pro-2:~ zach$ cd ~/Documents
+Zachs-MacBook-Pro-2:Documents zach$ pwd
+/Users/zach/Documents
+# relative path
+Zachs-MacBook-Pro-2:Documents zach$ cd ../Downloads
+Zachs-MacBook-Pro-2:Downloads zach$ pwd
+/Users/zach/Downloads
+# absolute path
+Zachs-MacBook-Pro-2:Downloads zach$ cd /Users/zach/Documents
+Zachs-MacBook-Pro-2:Documents zach$ pwd
+/Users/zach/Documents
+
+# ==== Task 3: cd / , cd ~ , cd / , cd ====
+Zachs-MacBook-Pro-2:Documents zach$ cd /
+Zachs-MacBook-Pro-2:/ zach$ pwd
+/
+Zachs-MacBook-Pro-2:/ zach$ cd ~
+Zachs-MacBook-Pro-2:~ zach$ pwd
+/Users/zach
+Zachs-MacBook-Pro-2:~ zach$ cd /
+Zachs-MacBook-Pro-2:/ zach$ pwd
+/
+Zachs-MacBook-Pro-2:/ zach$ cd
+Zachs-MacBook-Pro-2:~ zach$ pwd
+/Users/zach
+# cd and cd ~ both go back to the home directory
+
+# ==== Task 4: ls options ====
+Zachs-MacBook-Pro-2:~ zach$ cd ~/IdeaProjects/bioinformatics-portfolio
+Zachs-MacBook-Pro-2:bioinformatics-portfolio zach$ ls -l
+total 56
+drwxr-xr-x@ 19 zach  staff   608 Sep 25 20:06 01_UNIX_HPC
+-rw-r--r--@  1 zach  staff    79 Sep 10 13:19 README.md
+-rw-r--r--@  1 zach  staff  9694 Sep 25 20:20 UNIX_1_tasks.txt
+-rw-r--r--@  1 zach  staff  8835 Sep 25 20:06 UNIX_tasks.md
+Zachs-MacBook-Pro-2:bioinformatics-portfolio zach$ ls -R | head
+01_UNIX_HPC
+README.md
+UNIX_1_tasks.txt
+UNIX_tasks.md
+
+./01_UNIX_HPC:
+1_UNIX.md
+2_UNIX.md
+3_UNIX.md
+At_genes.gff.gz
+Zachs-MacBook-Pro-2:bioinformatics-portfolio zach$ ls -l -t -r
+total 56
+-rw-r--r--@  1 zach  staff    79 Sep 10 13:19 README.md
+drwxr-xr-x@ 19 zach  staff   608 Sep 25 20:06 01_UNIX_HPC
+-rw-r--r--@  1 zach  staff  8835 Sep 25 20:06 UNIX_tasks.md
+-rw-r--r--@  1 zach  staff  9694 Sep 25 20:20 UNIX_1_tasks.txt
+Zachs-MacBook-Pro-2:bioinformatics-portfolio zach$ ls -lh
+total 56
+drwxr-xr-x@ 19 zach  staff   608B Sep 25 20:06 01_UNIX_HPC
+-rw-r--r--@  1 zach  staff    79B Sep 10 13:19 README.md
+-rw-r--r--@  1 zach  staff   9.5K Sep 25 20:20 UNIX_1_tasks.txt
+-rw-r--r--@  1 zach  staff   8.6K Sep 25 20:06 UNIX_tasks.md
+
+# ==== Task 5: make directories and move between them (absolute + relative paths) ====
+Zachs-MacBook-Pro-2:bioinformatics-portfolio zach$ cd /Users/zach/Desktop
+Zachs-MacBook-Pro-2:Desktop zach$ mkdir unix
+Zachs-MacBook-Pro-2:Desktop zach$ cd /Users/zach/Desktop/unix
+Zachs-MacBook-Pro-2:unix zach$ mkdir Temp1
+Zachs-MacBook-Pro-2:unix zach$ cd Temp1
+Zachs-MacBook-Pro-2:Temp1 zach$ mkdir Temp2
+Zachs-MacBook-Pro-2:Temp1 zach$ cd Temp2
+Zachs-MacBook-Pro-2:Temp2 zach$ pwd
+/Users/zach/Desktop/unix/Temp1/Temp2
+# relative path
+Zachs-MacBook-Pro-2:Temp2 zach$ cd ../..
+Zachs-MacBook-Pro-2:unix zach$ pwd
+/Users/zach/Desktop/unix
+Zachs-MacBook-Pro-2:unix zach$ mkdir -p Dir1/Dir2
+Zachs-MacBook-Pro-2:unix zach$ cd Dir1/Dir2
+Zachs-MacBook-Pro-2:Dir2 zach$ pwd
+/Users/zach/Desktop/unix/Dir1/Dir2
+# absolute path
+Zachs-MacBook-Pro-2:Dir2 zach$ cd /Users/zach/Desktop/unix/Temp1/Temp2
+Zachs-MacBook-Pro-2:Temp2 zach$ pwd
+/Users/zach/Desktop/unix/Temp1/Temp2
+# relative path to a directory at the same level as Temp1
+Zachs-MacBook-Pro-2:Temp2 zach$ cd ../../Dir1
+Zachs-MacBook-Pro-2:Dir1 zach$ pwd
+/Users/zach/Desktop/unix/Dir1
+
+# ==== Task 6: remove an unwanted file from Downloads ====
+Zachs-MacBook-Pro-2:Dir1 zach$ cd /Users/zach/Desktop
+Zachs-MacBook-Pro-2:Desktop zach$ rmdir unix
+rmdir: unix: Directory not empty
+Zachs-MacBook-Pro-2:Desktop zach$ rm -r unix
+# unwanted files: scratch files in Downloads
+Zachs-MacBook-Pro-2:Desktop zach$ cd ~/Downloads
+Zachs-MacBook-Pro-2:Downloads zach$ ls scratch_*
+scratch_1.txt	scratch_2.txt	scratch_3.txt
+Zachs-MacBook-Pro-2:Downloads zach$ rm scratch_1.txt
+Zachs-MacBook-Pro-2:Downloads zach$ ls scratch_*
+scratch_2.txt	scratch_3.txt
+
+# ==== Task 7: make unix again and cd into it using tab completion ====
+Zachs-MacBook-Pro-2:Downloads zach$ cd ~
+Zachs-MacBook-Pro-2:~ zach$ mkdir Desktop/unix
+# typed: cd /Us<TAB>za<TAB>Des<TAB>un<TAB>
+Zachs-MacBook-Pro-2:~ zach$ cd /Users/zach/Desktop/unix/
+Zachs-MacBook-Pro-2:unix zach$ pwd
+/Users/zach/Desktop/unix
+
+# ==== Task 8: ? and * wildcards ====
+Zachs-MacBook-Pro-2:unix zach$ touch heaven.txt earth.txt
+Zachs-MacBook-Pro-2:unix zach$ mkdir Temp
+Zachs-MacBook-Pro-2:unix zach$ mv *.txt Temp/
+Zachs-MacBook-Pro-2:unix zach$ cd Temp
+Zachs-MacBook-Pro-2:Temp zach$ touch fat fit feet
+Zachs-MacBook-Pro-2:Temp zach$ ls f?t
+fat	fit
+Zachs-MacBook-Pro-2:Temp zach$ ls f*t
+fat	feet	fit
+Zachs-MacBook-Pro-2:Temp zach$ ls f??t
+feet
+# ? matches exactly one character, * matches any number of characters
+
+# ==== Task 9: move Temp3 into Temp without changing directory ====
+Zachs-MacBook-Pro-2:Temp zach$ cd ..
+Zachs-MacBook-Pro-2:unix zach$ mkdir Temp3
+Zachs-MacBook-Pro-2:unix zach$ cd ~
+Zachs-MacBook-Pro-2:~ zach$ mv Desktop/unix/Temp3 Desktop/unix/Temp/
+Zachs-MacBook-Pro-2:~ zach$ ls Desktop/unix/Temp/
+earth.txt	fat		feet		fit		heaven.txt	Temp3
+
+# ==== Task 10: trailing slash ====
+Zachs-MacBook-Pro-2:~ zach$ cd
+Zachs-MacBook-Pro-2:~ zach$ ls Desktop
+unix
+Zachs-MacBook-Pro-2:~ zach$ ls Desktop/
+unix
+# same output: the trailing slash is optional
+
+# ==== Task 11: remove the remaining file, then clean up Downloads with a wildcard ====
+Zachs-MacBook-Pro-2:~ zach$ cd /Users/zach/Desktop/unix
+Zachs-MacBook-Pro-2:unix zach$ touch dog.txt cat.txt owl.fa
+Zachs-MacBook-Pro-2:unix zach$ rm -i dog.txt
+remove dog.txt? y
+Zachs-MacBook-Pro-2:unix zach$ rm -i cat.txt
+remove cat.txt? y
+Zachs-MacBook-Pro-2:unix zach$ rm -i owl.fa
+remove owl.fa? y
+Zachs-MacBook-Pro-2:unix zach$ ls
+Temp
+Zachs-MacBook-Pro-2:unix zach$ cd ~/Downloads
+Zachs-MacBook-Pro-2:Downloads zach$ ls scratch_*
+scratch_2.txt	scratch_3.txt
+Zachs-MacBook-Pro-2:Downloads zach$ rm -i scratch_*
+remove scratch_2.txt? y
+remove scratch_3.txt? y
+Zachs-MacBook-Pro-2:Downloads zach$ ls scratch_*
+ls: scratch_*: No such file or directory
+
+# ==== Task 12: cp without -R, then remove unix and its contents ====
+Zachs-MacBook-Pro-2:Downloads zach$ cd ~/Desktop/unix
+Zachs-MacBook-Pro-2:unix zach$ mkdir Storage
+Zachs-MacBook-Pro-2:unix zach$ touch Storage/file1 Storage/file2 Storage/file3
+Zachs-MacBook-Pro-2:unix zach$ cp -R Storage Storage2
+Zachs-MacBook-Pro-2:unix zach$ ls Storage Storage2
+Storage:
+file1	file2	file3
+
+Storage2:
+file1	file2	file3
+Zachs-MacBook-Pro-2:unix zach$ cp Storage Storage3
+cp: Storage is a directory (not copied).
+# without -R, cp won't copy a directory
+Zachs-MacBook-Pro-2:unix zach$ cd ~/Desktop
+Zachs-MacBook-Pro-2:Desktop zach$ rm -ri unix
+examine files in directory unix? y
+examine files in directory unix/Temp? y
+examine files in directory unix/Temp/Temp3? y
+remove unix/Temp/Temp3? y
+remove unix/Temp/earth.txt? y
+remove unix/Temp/fit? y
+remove unix/Temp/feet? y
+remove unix/Temp/heaven.txt? y
+remove unix/Temp/fat? y
+remove unix/Temp? y
+examine files in directory unix/Storage? y
+remove unix/Storage/file3? y
+remove unix/Storage/file2? y
+remove unix/Storage/file1? y
+remove unix/Storage? y
+examine files in directory unix/Storage2? y
+remove unix/Storage2/file3? y
+remove unix/Storage2/file2? y
+remove unix/Storage2/file1? y
+remove unix/Storage2? y
+remove unix? y
+Zachs-MacBook-Pro-2:Desktop zach$ ls
+
+# ==== Task 13: download At_proteins.fasta and move it into a Data directory ====
+Zachs-MacBook-Pro-2:Desktop zach$ curl -O https://raw.githubusercontent.com/jamiehenzy/01_UNIX_HPC/main/At_proteins.fasta
+  % Total    % Received % Xferd  Average Speed   Time    Time     Time  Current
+                                 Dload  Upload   Total   Spent    Left  Speed
+100 17.0M  100 17.0M    0     0  49.3M      0 --:--:-- --:--:-- --:--:-- 49.4M
+Zachs-MacBook-Pro-2:Desktop zach$ mkdir Data
+Zachs-MacBook-Pro-2:Desktop zach$ mv At_proteins.fasta Data/
+Zachs-MacBook-Pro-2:Desktop zach$ ls Data
+At_proteins.fasta
+
+# ==== Task 14: aliases ====
+Zachs-MacBook-Pro-2:Desktop zach$ alias ls='ls -p'
+Zachs-MacBook-Pro-2:Desktop zach$ alias rm='rm -i'
+Zachs-MacBook-Pro-2:Desktop zach$ alias
+alias ls='ls -p'
+alias rm='rm -i'
+
+# ---- new terminal window ----
+Zachs-MacBook-Pro-2:~ zach$ cd ~/Desktop
+Zachs-MacBook-Pro-2:Desktop zach$ ls
+Data
+# no trailing slash: aliases only last for the session they were made in
+
+# ==== Task 15: make a profile file with nano ====
+Zachs-MacBook-Pro-2:Desktop zach$ cd ~
+Zachs-MacBook-Pro-2:~ zach$ nano profile
+Zachs-MacBook-Pro-2:~ zach$ cat profile
+# some useful command line short-cuts
+alias ls='ls -p'
+alias rm='rm -i'
+
+# ==== Task 16: source profile in a new terminal ====
+
+# ---- new terminal window ----
+Zachs-MacBook-Pro-2:~ zach$ cd ~
+Zachs-MacBook-Pro-2:~ zach$ source profile
+Zachs-MacBook-Pro-2:~ zach$ cd ~/Desktop
+Zachs-MacBook-Pro-2:Desktop zach$ ls
+Data/
+Zachs-MacBook-Pro-2:Desktop zach$ touch deleteme.txt
+Zachs-MacBook-Pro-2:Desktop zach$ rm deleteme.txt
+remove deleteme.txt? y
+# both aliases work: ls adds / to directories, rm asks before deleting
+
+# ==== Task 17: list hidden files in the home directory ====
+Zachs-MacBook-Pro-2:Desktop zach$ cd ~
+Zachs-MacBook-Pro-2:~ zach$ ls -a | head
+./
+../
+.ai/
+.android/
+.bash_history
+.bun/
+.bun_repl_history
+.bundle/
+.cache/
+.cagent/
+Zachs-MacBook-Pro-2:~ zach$ ls -a | grep -i profile
+.profile
+.zprofile
+.zprofile.pysave
+profile
+
+# ==== Task 18: source profile from a directory other than home ====
+
+# ---- new terminal window ----
+Zachs-MacBook-Pro-2:~ zach$ cd ~/Desktop
+Zachs-MacBook-Pro-2:Desktop zach$ ls
+Data
+Zachs-MacBook-Pro-2:Desktop zach$ source ../profile
+Zachs-MacBook-Pro-2:Desktop zach$ ls
+Data/
+
+# ==== Task 19: first shell script ====
+Zachs-MacBook-Pro-2:Desktop zach$ mkdir ~/Desktop/Code
+Zachs-MacBook-Pro-2:Desktop zach$ cd ~/Desktop/Code
+Zachs-MacBook-Pro-2:Code zach$ nano hello.sh
+Zachs-MacBook-Pro-2:Code zach$ cat hello.sh
+# my first Unix shell script
+echo "Hello World"
+
+# ==== Task 20: permissions and chmod ====
+Zachs-MacBook-Pro-2:Code zach$ bash hello.sh
+Hello World
+# bash hello.sh works without x permission because bash reads the file itself;
+# running it directly needs x:
+Zachs-MacBook-Pro-2:Code zach$ ls -l
+total 8
+-rw-r--r--@ 1 zach  staff  49 Sep 25 20:30 hello.sh
+Zachs-MacBook-Pro-2:Code zach$ ./hello.sh
+bash: ./hello.sh: Permission denied
+Zachs-MacBook-Pro-2:Code zach$ chmod u+x hello.sh
+Zachs-MacBook-Pro-2:Code zach$ ls -l
+total 8
+-rwxr--r--@ 1 zach  staff  49 Sep 25 20:30 hello.sh
+# owner permissions went from rw- to rwx
+Zachs-MacBook-Pro-2:Code zach$ bash hello.sh
+Hello World
+
+# ==== Task 21: run the script with ./ ====
+Zachs-MacBook-Pro-2:Code zach$ ./hello.sh
+Hello World
+
+# ==== Task 22: cleanup.sh ====
+Zachs-MacBook-Pro-2:Code zach$ nano cleanup.sh
+Zachs-MacBook-Pro-2:Code zach$ cat cleanup.sh
+#!/bin/bash
+# sort files in the current directory into folders by type
+mkdir -p Text PDFs Pictures Music Data Archives
+mv *.txt Text/
+mv *.pdf PDFs/
+mv *.jpg *.jpeg *.png Pictures/
+mv *.mp3 *.mscz Music/
+mv *.csv Data/
+mv *.zip Archives/
+
+# ==== Task 23: show the files, make cleanup.sh executable, run it, show the result ====
+
+# run on a test folder of sample files rather than my real Downloads
+Zachs-MacBook-Pro-2:Code zach$ mkdir messy_folder
+Zachs-MacBook-Pro-2:Code zach$ cd messy_folder
+Zachs-MacBook-Pro-2:messy_folder zach$ touch notes.txt todo.txt lecture1.pdf lecture2.pdf syllabus.pdf photo1.jpg photo2.jpeg molecule.png song.mp3 score.mscz data.csv archive.zip
+Zachs-MacBook-Pro-2:messy_folder zach$ ls
+archive.zip	data.csv	lecture1.pdf	lecture2.pdf	molecule.png	notes.txt	photo1.jpg	photo2.jpeg	score.mscz	song.mp3	syllabus.pdf	todo.txt
+Zachs-MacBook-Pro-2:messy_folder zach$ chmod u+x ../cleanup.sh
+Zachs-MacBook-Pro-2:messy_folder zach$ ../cleanup.sh
+Zachs-MacBook-Pro-2:messy_folder zach$ ls
+Archives/	Data/		Music/		PDFs/		Pictures/	Text/
+Zachs-MacBook-Pro-2:messy_folder zach$ ls PDFs Pictures
+PDFs:
+lecture1.pdf	lecture2.pdf	syllabus.pdf
+
+Pictures:
+molecule.png	photo1.jpg	photo2.jpeg
