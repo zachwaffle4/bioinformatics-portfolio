@@ -1,0 +1,243 @@
+# 3_UNIX.md - Exercises 1-10
+# Zach Harel
+# Run on the Explorer cluster (compute node c0644), with comments added.
+# Long outputs are cut to the first 10 lines; each cut is marked.
+
+# ==== Exercise 1: list files in /usr/bin by pattern ====
+# I listed /usr/bin and filtered it with grep instead of using ls wildcards
+# (ls /usr/bin/c*, ls /usr/bin/*a*, ls /usr/bin/*o, ls /usr/bin/*[ac]*).
+# Same lists; grep's ^ and $ mark the start and end of each name.
+
+# 1. names that start with c
+[harel.z@c0644]/courses/BIOL2406.202710/students/harel.z/bioinformatics-portfolio% ls /usr/bin | grep '^c'
+c++
+c89
+c99
+cal
+ca-legacy
+callgrind_annotate
+callgrind_control
+canberra-boot
+canberra-gtk-play
+captoinfo
+# (output cut: first 10 lines shown)
+
+# 2. names that contain a
+# First try was a typo: /bin/bash is one file, not a directory, so ls just
+# printed that file's path (which contains an a).
+[harel.z@c0644]/courses/BIOL2406.202710/students/harel.z/bioinformatics-portfolio% ls /bin/bash | grep 'a'
+/bin/bash
+[harel.z@c0644]/courses/BIOL2406.202710/students/harel.z/bioinformatics-portfolio% ls /usr/bin | grep 'a'
+a2x
+a2x.py
+ab
+ac
+aclocal
+aclocal-1.16
+acyclic
+addr2line
+agentxtrap
+alias
+# (output cut: first 10 lines shown)
+
+# 3. names that end with o
+# First try had the anchor backwards: ^ only means "start of line" at the
+# beginning of a pattern, so 'o^' looked for a literal "o^" and found nothing.
+# $ is the end-of-line anchor.
+[harel.z@c0644]/courses/BIOL2406.202710/students/harel.z/bioinformatics-portfolio% ls /usr/bin | grep 'o^'
+[harel.z@c0644]/courses/BIOL2406.202710/students/harel.z/bioinformatics-portfolio% ls /usr/bin | grep 'o$'
+avinfo
+bluetooth-sendto
+captoinfo
+cd-info
+circo
+cpio
+createrepo
+distro
+echo
+find-debuginfo
+# (output cut: first 10 lines shown)
+
+# Bonus: names that contain a or c
+# Basic grep treats ( | ) as literal characters, so '(a|c)' looked for the
+# text "(a|c)". A leading * is also literal, so the next two attempts needed
+# an actual * in the name. None of them matched anything.
+[harel.z@c0644]/courses/BIOL2406.202710/students/harel.z/bioinformatics-portfolio% ls /usr/bin | grep '(a|c)'
+[harel.z@c0644]/courses/BIOL2406.202710/students/harel.z/bioinformatics-portfolio% ls /usr/bin | grep '*(a|c)*'
+[harel.z@c0644]/courses/BIOL2406.202710/students/harel.z/bioinformatics-portfolio% ls /usr/bin | grep '*\(a\|c\)*'
+# A bracket expression matches any one of the characters inside it:
+[harel.z@c0644]/courses/BIOL2406.202710/students/harel.z/bioinformatics-portfolio% ls /usr/bin | grep '[ac]'
+a2x
+a2x.py
+ab
+ac
+aclocal
+aclocal-1.16
+acyclic
+addr2line
+agentxtrap
+alias
+# (output cut: first 10 lines shown)
+
+# ==== Exercise 2: print FASTQ files with cat ====
+# 1. From the top level of my student directory, print SRR097977.fastq.
+#    head needs -n before a number; head 10 treated 10 as a filename.
+#    head with no number shows the first 10 lines. (The last line is at the
+#    end of this transcript, from tail -n 1.)
+[harel.z@c0644]/courses/BIOL2406.202710/students/harel.z/bioinformatics-portfolio% cd /courses/BIOL2406.202710/students/harel.z
+[harel.z@c0644]/courses/BIOL2406.202710/students/harel.z% cat bioinformatics-portfolio/module-1-unix/untrimmed_fastq/SRR097977.fastq | head 10
+head: cannot open '10' for reading: No such file or directory
+[harel.z@c0644]/courses/BIOL2406.202710/students/harel.z% cat bioinformatics-portfolio/module-1-unix/untrimmed_fastq/SRR097977.fastq | head
+@SRR097977.1 209DTAAXX_Lenski2_1_7:8:3:710:178 length=36
+TATTCTGCCATAATGAAATTCGCCACTTGTTAGTGT
++SRR097977.1 209DTAAXX_Lenski2_1_7:8:3:710:178 length=36
+CCCCCCCCCCCCCCC>CCCCC7CCCCCCACA?5A5<
+@SRR097977.2 209DTAAXX_Lenski2_1_7:8:3:365:371 length=36
+GGTTACTCTTTTAACCTTGATGTTTCGACGCTGTAT
++SRR097977.2 209DTAAXX_Lenski2_1_7:8:3:365:371 length=36
+CC:?:CC:?CCCCC??C?:?C-&:C:,?<&*?+7?<
+@SRR097977.3 209DTAAXX_Lenski2_1_7:8:3:663:569 length=36
+TTGTTCGCTTTTGGTAATTAATCCCGGAAATAATAA
+
+# 2. From my home directory, print every file in untrimmed_fastq with one command.
+[harel.z@c0644]/courses/BIOL2406.202710/students/harel.z% cd ~
+[harel.z@c0644]~% cat /courses/BIOL2406.202710/students/harel.z/bioinformatics-portfolio/module-1-unix/untrimmed_fastq/*.fastq | head
+@SRR097977.1 209DTAAXX_Lenski2_1_7:8:3:710:178 length=36
+TATTCTGCCATAATGAAATTCGCCACTTGTTAGTGT
++SRR097977.1 209DTAAXX_Lenski2_1_7:8:3:710:178 length=36
+CCCCCCCCCCCCCCC>CCCCC7CCCCCCACA?5A5<
+@SRR097977.2 209DTAAXX_Lenski2_1_7:8:3:365:371 length=36
+GGTTACTCTTTTAACCTTGATGTTTCGACGCTGTAT
++SRR097977.2 209DTAAXX_Lenski2_1_7:8:3:365:371 length=36
+CC:?:CC:?CCCCC??C?:?C-&:C:,?<&*?+7?<
+@SRR097977.3 209DTAAXX_Lenski2_1_7:8:3:663:569 length=36
+TTGTTCGCTTTTGGTAATTAATCCCGGAAATAATAA
+
+# ==== Exercise 3: search SRR097977.fastq for TTTTT in less ====
+# In less I typed /TTTTT. The next three nucleotides after the first match are CAC.
+[harel.z@c0644]~% cd /courses/BIOL2406.202710/students/harel.z/bioinformatics-portfolio/module-1-unix/untrimmed_fastq
+[harel.z@c0644]/courses/BIOL2406.202710/students/harel.z/bioinformatics-portfolio/module-1-unix/untrimmed_fastq% less SRR097977.fastq
+
+# ==== Exercise 4: back up the FASTQ files and write-protect the backups ====
+# 1. There's no backup directory yet, so there's nothing to delete.
+[harel.z@c0644]/courses/BIOL2406.202710/students/harel.z/bioinformatics-portfolio/module-1-unix/untrimmed_fastq% ls
+SRR097977.fastq  SRR098026.fastq
+# 2. Back up each file with cp.
+[harel.z@c0644]/courses/BIOL2406.202710/students/harel.z/bioinformatics-portfolio/module-1-unix/untrimmed_fastq% cp SRR097977.fastq SRR097977.backup.fastq
+[harel.z@c0644]/courses/BIOL2406.202710/students/harel.z/bioinformatics-portfolio/module-1-unix/untrimmed_fastq% cp SRR098026.fastq SRR098026.backup.fastq
+# 3. Move all the backups into a backup directory with a wildcard.
+[harel.z@c0644]/courses/BIOL2406.202710/students/harel.z/bioinformatics-portfolio/module-1-unix/untrimmed_fastq% mkdir backup
+[harel.z@c0644]/courses/BIOL2406.202710/students/harel.z/bioinformatics-portfolio/module-1-unix/untrimmed_fastq% mv *.backup.fastq backup
+[harel.z@c0644]/courses/BIOL2406.202710/students/harel.z/bioinformatics-portfolio/module-1-unix/untrimmed_fastq% ls
+backup  SRR097977.fastq  SRR098026.fastq
+[harel.z@c0644]/courses/BIOL2406.202710/students/harel.z/bioinformatics-portfolio/module-1-unix/untrimmed_fastq% ls backup
+SRR097977.backup.fastq  SRR098026.backup.fastq
+# 4. Remove write permission for everyone (a-w), then check: no w left.
+[harel.z@c0644]/courses/BIOL2406.202710/students/harel.z/bioinformatics-portfolio/module-1-unix/untrimmed_fastq% chmod a-w backup/*
+[harel.z@c0644]/courses/BIOL2406.202710/students/harel.z/bioinformatics-portfolio/module-1-unix/untrimmed_fastq% ls -l backup
+total 89
+-r-xr-xr-x 1 harel.z BIOL2406.202710-staff 47552 Sep 28 21:54 SRR097977.backup.fastq
+-r-xr-xr-x 1 harel.z BIOL2406.202710-staff 43332 Sep 28 21:54 SRR098026.backup.fastq
+
+# ==== Exercise 5: grep with the identifier line ====
+# -B1 also prints the line before each match, which is the @ identifier line.
+# 1. GNATNACCACTTCC in SRR098026.fastq
+[harel.z@c0644]/courses/BIOL2406.202710/students/harel.z/bioinformatics-portfolio/module-1-unix/untrimmed_fastq% grep -B1 'GNATNACCACTTCC' SRR098026.fastq
+@SRR098026.245 HWUSI-EAS1599_1:2:1:2:801 length=35
+GNATNACCACTTCCAGTGCTGANNNNNNNGGGATG
+# 2. AAGTT in both FASTQ files. With more than one file, grep prefixes each
+#    line with the file name (: for matches, - for context lines).
+[harel.z@c0644]/courses/BIOL2406.202710/students/harel.z/bioinformatics-portfolio/module-1-unix/untrimmed_fastq% grep -B1 'AAGTT' *.fastq
+SRR097977.fastq-@SRR097977.11 209DTAAXX_Lenski2_1_7:8:3:247:351 length=36
+SRR097977.fastq:GATTGCTTTAATGAAAAAGTCATATAAGTTGCCATG
+--
+SRR097977.fastq-@SRR097977.67 209DTAAXX_Lenski2_1_7:8:3:544:566 length=36
+SRR097977.fastq:TTGTCCACGCTTTTCTATGTAAAGTTTATTTGCTTT
+--
+SRR097977.fastq-@SRR097977.68 209DTAAXX_Lenski2_1_7:8:3:724:110 length=36
+SRR097977.fastq:TGAAGCCTGCTTTTTTATACTAAGTTTGCATTATAA
+--
+SRR097977.fastq-@SRR097977.80 209DTAAXX_Lenski2_1_7:8:3:258:281 length=36
+SRR097977.fastq:GTGGCGCTGCTGCATAAGTTGGGTTATCAGGTCGTT
+--
+SRR097977.fastq-@SRR097977.92 209DTAAXX_Lenski2_1_7:8:3:353:318 length=36
+SRR097977.fastq:GGCAAAATGGTCCTCCAGCCAGGCCAGAAGCAAGTT
+--
+SRR097977.fastq-@SRR097977.139 209DTAAXX_Lenski2_1_7:8:3:703:655 length=36
+SRR097977.fastq:TTTATTTGTAAAGTTTTGTTGAAATAAGGGTTGTAA
+--
+SRR097977.fastq-@SRR097977.238 209DTAAXX_Lenski2_1_7:8:3:592:919 length=36
+SRR097977.fastq:TTCTTACCATCCTGAAGTTTTTTCATCTTCCCTGAT
+--
+SRR098026.fastq-@SRR098026.158 HWUSI-EAS1599_1:2:1:1:1505 length=35
+SRR098026.fastq:GNNNNNNNNCAAAGTTGATCNNNNNNNNNTGTGCG
+
+# ==== Exercise 6: how many sequences are in SRR098026.fastq? ====
+# Each FASTQ record is 4 lines, so 996 / 4 = 249 sequences.
+[harel.z@c0644]/courses/BIOL2406.202710/students/harel.z/bioinformatics-portfolio/module-1-unix/untrimmed_fastq% wc -l SRR098026.fastq
+996 SRR098026.fastq
+
+# ==== Exercise 2 (answer), 7, 8 and 10 ====
+[harel.z@c0644]/courses/BIOL2406.202710/students/harel.z/bioinformatics-portfolio/module-1-unix/untrimmed_fastq% cd /courses/BIOL2406.202710/students/harel.z/bioinformatics-portfolio/module-1-unix/untrimmed_fastq
+
+# Exercise 2.1 answer: the last line of SRR097977.fastq
+[harel.z@c0644]/courses/BIOL2406.202710/students/harel.z/bioinformatics-portfolio/module-1-unix/untrimmed_fastq% tail -n 1 SRR097977.fastq
+C:CCC::CCCCCCCC<8?6A:C28C<608'&&&,'$
+
+# Set up the .txt files the loops work on, as in the tutorial: the bad reads
+# from SRR098026 (redirected with >), and the first two lines of each FASTQ
+# file (appended with >>).
+[harel.z@c0644]/courses/BIOL2406.202710/students/harel.z/bioinformatics-portfolio/module-1-unix/untrimmed_fastq% grep -B1 -A2 NNNNNNNNNN SRR098026.fastq > bad_reads.txt
+[harel.z@c0644]/courses/BIOL2406.202710/students/harel.z/bioinformatics-portfolio/module-1-unix/untrimmed_fastq% for filename in *.fastq; do head -n 2 ${filename} >> seq_info.txt; done
+[harel.z@c0644]/courses/BIOL2406.202710/students/harel.z/bioinformatics-portfolio/module-1-unix/untrimmed_fastq% ls *.txt
+bad_reads.txt
+seq_info.txt
+
+# Exercise 7: print the prefix of every .txt file.
+# basename strips the .txt ending; $( ) saves the result in the name variable.
+[harel.z@c0644]/courses/BIOL2406.202710/students/harel.z/bioinformatics-portfolio/module-1-unix/untrimmed_fastq% for filename in *.txt; do name=$(basename ${filename} .txt); echo ${name}; done
+bad_reads
+seq_info
+
+# The tutorial's loop that adds _2021 to every .txt file:
+[harel.z@c0644]/courses/BIOL2406.202710/students/harel.z/bioinformatics-portfolio/module-1-unix/untrimmed_fastq% for filename in *.txt; do name=$(basename ${filename} .txt); mv ${filename} ${name}_2021.txt; done
+[harel.z@c0644]/courses/BIOL2406.202710/students/harel.z/bioinformatics-portfolio/module-1-unix/untrimmed_fastq% ls *.txt
+bad_reads_2021.txt
+seq_info_2021.txt
+
+# Exercise 8: remove _2021 again. basename strips _2021.txt, then mv puts
+# back a plain .txt ending.
+[harel.z@c0644]/courses/BIOL2406.202710/students/harel.z/bioinformatics-portfolio/module-1-unix/untrimmed_fastq% for filename in *_2021.txt; do name=$(basename ${filename} _2021.txt); mv ${filename} ${name}.txt; done
+[harel.z@c0644]/courses/BIOL2406.202710/students/harel.z/bioinformatics-portfolio/module-1-unix/untrimmed_fastq% ls *.txt
+bad_reads.txt
+seq_info.txt
+
+# Writing bad-reads-script.sh. I wrote the file with cat and a heredoc instead of nano.
+# -h leaves file names off grep's output; grep -v '^--' drops the -- separator lines.
+[harel.z@c0644]/courses/BIOL2406.202710/students/harel.z/bioinformatics-portfolio/module-1-unix/untrimmed_fastq% cat > bad-reads-script.sh <<'SCRIPT'
+grep -B1 -A2 -h NNNNNNNNNN *.fastq | grep -v '^--' > scripted_bad_reads.txt
+SCRIPT
+[harel.z@c0644]/courses/BIOL2406.202710/students/harel.z/bioinformatics-portfolio/module-1-unix/untrimmed_fastq% bash bad-reads-script.sh
+[harel.z@c0644]/courses/BIOL2406.202710/students/harel.z/bioinformatics-portfolio/module-1-unix/untrimmed_fastq% wc -l scripted_bad_reads.txt
+536 scripted_bad_reads.txt
+# 536 lines / 4 = 134 bad reads, with the -- separators removed.
+
+# Exercise 10: add echo "Script finished!" to the end of the script and run it again.
+[harel.z@c0644]/courses/BIOL2406.202710/students/harel.z/bioinformatics-portfolio/module-1-unix/untrimmed_fastq% echo 'echo "Script finished!"' >> bad-reads-script.sh
+[harel.z@c0644]/courses/BIOL2406.202710/students/harel.z/bioinformatics-portfolio/module-1-unix/untrimmed_fastq% cat bad-reads-script.sh
+grep -B1 -A2 -h NNNNNNNNNN *.fastq | grep -v '^--' > scripted_bad_reads.txt
+echo "Script finished!"
+[harel.z@c0644]/courses/BIOL2406.202710/students/harel.z/bioinformatics-portfolio/module-1-unix/untrimmed_fastq% bash bad-reads-script.sh
+Script finished!
+
+# Making the script into a program: +x adds execute permission, so it can
+# run with ./ instead of bash.
+[harel.z@c0644]/courses/BIOL2406.202710/students/harel.z/bioinformatics-portfolio/module-1-unix/untrimmed_fastq% chmod +x bad-reads-script.sh
+[harel.z@c0644]/courses/BIOL2406.202710/students/harel.z/bioinformatics-portfolio/module-1-unix/untrimmed_fastq% ls -l bad-reads-script.sh
+-rwxr-xr-x 1 harel.z BIOL2406.202710-staff 100 Sep 28 22:00 bad-reads-script.sh
+[harel.z@c0644]/courses/BIOL2406.202710/students/harel.z/bioinformatics-portfolio/module-1-unix/untrimmed_fastq% ./bad-reads-script.sh
+Script finished!
+
+# ==== Exercise 9: README.txt with the date ====
+# I use neovim rather than nano. README.txt (containing the date, 2026-09-28)
+# is in module-1-unix/ in this repo.
