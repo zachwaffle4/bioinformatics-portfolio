@@ -1,0 +1,130 @@
+# Bowtie2 tutorial session (lambda phage)
+# Run on Explorer, in:
+#   /courses/BIOL2406.202710/students/harel.z/inclass/bowtie
+#
+# Part 1 (indexing and alignment) was run in class on Oct 8 with the exact commands from
+# 02_Explore/2_bowtie2_tutorial.md, but that terminal session was not saved. It is reconstructed below from the
+# tutorial, so no console output was captured for it, except the genome length and read counts, which were
+# re-measured on Oct 18 and are marked as such.
+# Part 2 (samtools/bcftools) is the real saved session, with its output.
+
+# ===========================================================================
+# PART 1: index and align (reconstructed from the tutorial; run Oct 8, output not saved)
+# ===========================================================================
+
+# Peek at the first lines of the genome and the two read files
+$ head lambda_virus.fa
+$ head reads_1.fq
+$ head reads_2.fq
+# (re-run Oct 18, trimmed) the genome header is ">gi|9626243|ref|NC_001416.1| Enterobacteria phage lambda, complete genome";
+# the reads are FASTQ with names like "@r1", one 4-line record per read, with Ns at a few low-quality positions.
+
+# Length of the genome: count the characters on the sequence lines, ignoring the header line and newlines
+$ grep -v ">" lambda_virus.fa | tr -d "\n" | wc -c
+48502
+
+# Number of reads in each FASTQ file: every read takes 4 lines, so reads = lines / 4
+$ wc -l reads_1.fq reads_2.fq
+  40000 reads_1.fq
+  40000 reads_2.fq
+  80000 total
+# 40000 / 4 = 10,000 reads in each file (re-run Oct 18)
+
+# Build the bowtie2 index (six lambda_virus*.bt2 files) from the genome, one level below lambda_virus.fa in index/
+$ cd index
+$ bowtie2-build ../lambda_virus.fa lambda_virus
+
+# Align reads_1.fq as unpaired reads (-U) to the index and write SAM to eg1.sam
+$ bowtie2 -x lambda_virus -U ../reads_1.fq -S eg1.sam
+
+# Align both files as paired-end reads (-1/-2) and write SAM to eg2.sam
+$ bowtie2 -x lambda_virus -1 ../reads_1.fq -2 ../reads_2.fq -S eg2.sam
+
+# ===========================================================================
+# PART 2: SAM to BAM to variants (saved session, run Oct 18)
+# ===========================================================================
+
+# Request an interactive shell on a compute node (job 11191806)
+[harel.z@explorer-02]/courses/BIOL2406.202710/students/harel.z/inclass/bowtie% srun --pty zsh
+srun: job 11191806 queued and waiting for resources
+srun: job 11191806 has been allocated resources
+
+# Move into the directory that holds the bowtie2 index and the SAM files
+[harel.z@c0649]/courses/BIOL2406.202710/students/harel.z/inclass/bowtie% cd index
+
+# List the files: the six lambda_virus index files plus the two SAM files from the earlier alignments
+[harel.z@c0649]/courses/BIOL2406.202710/students/harel.z/inclass/bowtie/index% ls
+eg1.sam  eg2.sam  lambda_virus.1.bt2  lambda_virus.2.bt2  lambda_virus.3.bt2  lambda_virus.4.bt2  lambda_virus.rev.1.bt2  lambda_virus.rev.2.bt2
+
+# Re-run the paired-end alignment, writing to eg2.sam.
+# FAILED: the bowtie2 module is not loaded in this new node session, so the command was not found.
+# eg2.sam was NOT regenerated; the file used below is the one from the earlier session.
+[harel.z@c0649]/courses/BIOL2406.202710/students/harel.z/inclass/bowtie/index% bowtie2 -x lambda_virus -1 ../reads_1.fq -2 ../reads_2.fq -S eg2.sam
+zsh: command not found: bowtie2
+
+# Load the samtools module (bowtie2 is no longer needed from here on)
+[harel.z@c0649]/courses/BIOL2406.202710/students/harel.z/inclass/bowtie/index% module load samtools
+
+# Convert the paired-end alignment from text SAM to binary BAM (-b = BAM output, -S = input is SAM)
+[harel.z@c0649]/courses/BIOL2406.202710/students/harel.z/inclass/bowtie/index% samtools view -bS eg2.sam > eg2.bam
+
+# Check that eg2.bam was created
+[harel.z@c0649]/courses/BIOL2406.202710/students/harel.z/inclass/bowtie/index% ls
+eg1.sam  eg2.bam  eg2.sam  lambda_virus.1.bt2  lambda_virus.2.bt2  lambda_virus.3.bt2  lambda_virus.4.bt2  lambda_virus.rev.1.bt2  lambda_virus.rev.2.bt2
+
+# Sort the BAM by genomic coordinate into eg2.sorted.bam, the form needed for variant calling
+[harel.z@c0649]/courses/BIOL2406.202710/students/harel.z/inclass/bowtie/index% samtools sort eg2.bam -o eg2.sorted.bam
+
+# Open eg2.bam in vim to look at it (a BAM is compressed binary, so it is not human-readable)
+[harel.z@c0649]/courses/BIOL2406.202710/students/harel.z/inclass/bowtie/index% vim eg2.bam
+
+# Pile up the reads against the lambda reference and write VCF text (-Ov) to eg2.raw.bcf.
+# FAILED: the bcftools module is not loaded, so both halves of the pipe were not found.
+[harel.z@c0649]/courses/BIOL2406.202710/students/harel.z/inclass/bowtie/index% bcftools mpileup -f ../lambda_virus.fa eg2.sorted.bam | bcftools view -Ov - > eg2.raw.bcf
+zsh: command not found: bcftools
+zsh: command not found: bcftools
+
+# Load the bcftools module
+[harel.z@c0649]/courses/BIOL2406.202710/students/harel.z/inclass/bowtie/index% module load bcftools
+
+# Same pileup command again, now working. mpileup reads eg2.sorted.bam against ../lambda_virus.fa
+# (1 sample, max 250 reads per position) and bcftools view writes the result as VCF text.
+[harel.z@c0649]/courses/BIOL2406.202710/students/harel.z/inclass/bowtie/index% bcftools mpileup -f ../lambda_virus.fa eg2.sorted.bam | bcftools view -Ov - > eg2.raw.bcf
+[mpileup] 1 samples in 1 input files
+[mpileup] maximum number of reads per input file set to -d 250
+
+# Write the contents of eg2.raw.bcf to variants.txt
+[harel.z@c0649]/courses/BIOL2406.202710/students/harel.z/inclass/bowtie/index% bcftools view eg2.raw.bcf > variants.txt
+
+# View variants.txt in vim
+[harel.z@c0649]/courses/BIOL2406.202710/students/harel.z/inclass/bowtie/index% vim variants.txt
+
+# ---------------------------------------------------------------------------
+# Second pass: actual variant calling
+# ---------------------------------------------------------------------------
+# The tutorial's command stops at mpileup, so the eg2.raw.bcf and variants.txt above hold one pileup record per
+# genome position (~48,500 records for the 48,502 bp genome), not variant calls. Found the missing step by web
+# search: pipe mpileup into `bcftools call`. This overwrote eg2.raw.bcf and variants.txt.
+
+# Pile up eg2.sorted.bam against the reference, then call variants (-m = multiallelic caller, -v = keep variant
+# sites only) and write compressed BCF (-Ob) to eg2.raw.bcf.
+# The "diploid" note is only a default-ploidy warning; lambda phage is haploid, so every call shows as 1/1.
+[harel.z@c0649]/courses/BIOL2406.202710/students/harel.z/inclass/bowtie/index% bcftools mpileup -f ../lambda_virus.fa eg2.sorted.bam | bcftools call -mv -Ob -o eg2.raw.bcf
+Note: none of --samples-file, --ploidy or --ploidy-file given, assuming all sites are diploid
+[mpileup] 1 samples in 1 input files
+[mpileup] maximum number of reads per input file set to -d 250
+
+# Convert the binary BCF to VCF text in variants.txt (now 90 variant records)
+[harel.z@c0649]/courses/BIOL2406.202710/students/harel.z/inclass/bowtie/index% bcftools view eg2.raw.bcf > variants.txt
+
+# View variants.txt in vim
+[harel.z@c0649]/courses/BIOL2406.202710/students/harel.z/inclass/bowtie/index% vim variants.txt
+
+# ---------------------------------------------------------------------------
+# Notes
+# ---------------------------------------------------------------------------
+# The versions of eg2.raw.bcf and variants.txt in this repo are from the second pass (90 called variants).
+# Not covered by this session (the tutorial also asks for these):
+#   - head of lambda_virus.fa, reads_1.fq, reads_2.fq
+#   - genome length and the number of reads in each FASTQ file
+#   - bowtie2-build, and the unpaired (eg1.sam) and paired (eg2.sam) alignments

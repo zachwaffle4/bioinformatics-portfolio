@@ -1,0 +1,563 @@
+# Variants tutorial session (sea cucumber, Parastichopus parvimensis)
+# Follows 02_Explore/3_Variants_tutorial.md, including the three in-class exercises.
+# Run on Explorer (compute node, 1 task / 4 CPUs) on Oct 18, in:
+#   /courses/BIOL2406.202710/students/harel.z/inclass/variants
+# The commands were run by scripts/run_variants_session.sh and the log was cleaned up afterwards:
+#   - removed fastqc's "null" / "Started analysis" / "Approx 100% complete" progress lines
+#   - kept the cutadapt adapter table for the first run only (it is identical for every file)
+# Answers to the in-class exercises are in variants_exercise_answers.txt.
+#
+# Tools: fastqc/0.12.1, cutadapt 5.2 (conda env), bowtie2, samtools, angsd 0.940 (conda env)
+
+
+# Copy the Sea_cuke course data (1 genome, 6 fastq.gz) into my own directory and unzip it
+$ cp /courses/BIOL2406.202710/data/Sea_cuke/* .
+$ gunzip *.gz
+$ ls
+Ppar_tinygenome.fna
+run_variants_session.sh
+SRR6805880.tiny.fastq
+SRR6805881.tiny.fastq
+SRR6805882.tiny.fastq
+SRR6805883.tiny.fastq
+SRR6805884.tiny.fastq
+SRR6805885.tiny.fastq
+variants_session_raw.log
+
+# Header line of the genome sequences (first few)
+$ grep ">" Ppar_tinygenome.fna | head -5
+>KN893585.1 Parastichopus parvimensis isolate Sea Cucumber 01 unplaced genomic scaffold Scaffold11424, whole genome shotgun sequence
+>KN897506.1 Parastichopus parvimensis isolate Sea Cucumber 01 unplaced genomic scaffold Scaffold15978, whole genome shotgun sequence
+>JXUT01146130.1 Apostichopus parvimensis isolate Sea Cucumber 01 contig_146132, whole genome shotgun sequence
+>KN897010.1 Parastichopus parvimensis isolate Sea Cucumber 01 unplaced genomic scaffold Scaffold15312, whole genome shotgun sequence
+>KN894258.1 Parastichopus parvimensis isolate Sea Cucumber 01 unplaced genomic scaffold Scaffold12126, whole genome shotgun sequence
+$ grep -c ">" Ppar_tinygenome.fna
+2000
+
+# What the read files look like (first two reads of one file)
+$ head -8 SRR6805880.tiny.fastq
+@SRR6805880.2151832 OCD6D:00225:02960 length=80
+TGCAGAAGGCATGACCTTACCTACTGAATAAAAGATGAGACACCTTCTCATTGGCCAAGAAGAAACAACACTCTATTACA
++
+47:7775<59999995:6;;5:7664621111*/52245554404/33533/3/30436724461./,.:79999:4:9:
+@SRR6805880.576388 9F8KO:05533:11649 length=80
+TGCAGTCGTAATCTAGGAACACACCTACGGGATTATTTACTATTTTACAATCCATAGTCGGAGTCTACAAACAGTTACCA
++
+135445878868?;:7474889//+/665628958::2788:>;;09:9556-315447817999::;::28///27:18
+
+# Number of reads per fastq file (4 lines per read)
+$ for f in *.fastq; do echo "$f $(( $(wc -l < $f) / 4 ))"; done
+SRR6805880.tiny.fastq 1000
+SRR6805881.tiny.fastq 1000
+SRR6805882.tiny.fastq 1000
+SRR6805883.tiny.fastq 1000
+SRR6805884.tiny.fastq 1000
+SRR6805885.tiny.fastq 1000
+
+# Raw read quality control with fastqc: one file first
+$ module load fastqc
+Loading fastqc/0.12.1
+  Loading requirement: OpenJDK/22.0.2 perl/5.40.0
+$ fastqc SRR6805880.tiny.fastq
+Analysis complete for SRR6805880.tiny.fastq
+$ ls
+Ppar_tinygenome.fna
+run_variants_session.sh
+SRR6805880.tiny.fastq
+SRR6805880.tiny_fastqc.html
+SRR6805880.tiny_fastqc.zip
+SRR6805881.tiny.fastq
+SRR6805882.tiny.fastq
+SRR6805883.tiny.fastq
+SRR6805884.tiny.fastq
+SRR6805885.tiny.fastq
+variants_session_raw.log
+
+# fastqc on the remaining files
+$ fastqc SRR680588[1-5].tiny.fastq
+Analysis complete for SRR6805881.tiny.fastq
+Analysis complete for SRR6805882.tiny.fastq
+Analysis complete for SRR6805883.tiny.fastq
+Analysis complete for SRR6805884.tiny.fastq
+Analysis complete for SRR6805885.tiny.fastq
+$ ls *fastqc*
+SRR6805880.tiny_fastqc.html
+SRR6805880.tiny_fastqc.zip
+SRR6805881.tiny_fastqc.html
+SRR6805881.tiny_fastqc.zip
+SRR6805882.tiny_fastqc.html
+SRR6805882.tiny_fastqc.zip
+SRR6805883.tiny_fastqc.html
+SRR6805883.tiny_fastqc.zip
+SRR6805884.tiny_fastqc.html
+SRR6805884.tiny_fastqc.zip
+SRR6805885.tiny_fastqc.html
+SRR6805885.tiny_fastqc.zip
+
+# Do the reads start with the same bases? Count reads beginning with TGCAG (the adapter remnant) in one file
+$ grep -c "^TGCAG" SRR6805880.tiny.fastq
+1000
+$ head -2 SRR6805880.tiny.fastq
+@SRR6805880.2151832 OCD6D:00225:02960 length=80
+TGCAGAAGGCATGACCTTACCTACTGAATAAAAGATGAGACACCTTCTCATTGGCCAAGAAGAAACAACACTCTATTACA
+
+# Activate cutadapt and trim the 5-prime TGCAG from one file
+$ module load anaconda3/2024.06
+$ source activate /courses/BIOL2406.202710/shared/cutadapt_env
+$ cutadapt -g TGCAG SRR6805880.tiny.fastq -o SRR6805880.tiny_trimmed.fastq
+This is cutadapt 5.2 with Python 3.13.16
+Command line parameters: -g TGCAG SRR6805880.tiny.fastq -o SRR6805880.tiny_trimmed.fastq
+Processing single-end reads on 1 core ...
+
+=== Summary ===
+
+Total reads processed:                   1,000
+Reads with adapters:                     1,000 (100.0%)
+Reads written (passing filters):         1,000 (100.0%)
+
+Total basepairs processed:        80,000 bp
+Total written (filtered):         75,000 bp (93.8%)
+
+=== Adapter 1 ===
+
+Sequence: TGCAG; Type: regular 5'; Length: 5; Trimmed: 1000 times
+
+Minimum overlap: 3
+No. of allowed errors:
+1-5 bp: 0
+
+Overview of removed sequences
+length	count	expect	max.err	error counts
+5	1000	1.0	0	1000
+
+# Trim all the read files with a for loop
+$ for filename in *.tiny.fastq
+do
+  base=$(basename $filename .tiny.fastq)
+  echo ${base}
+  cutadapt -g TGCAG ${base}.tiny.fastq -o ${base}.tiny_trimmed.fastq
+done
+SRR6805880
+
+=== Summary ===
+
+Total reads processed:                   1,000
+Reads with adapters:                     1,000 (100.0%)
+Reads written (passing filters):         1,000 (100.0%)
+
+Total basepairs processed:        80,000 bp
+Total written (filtered):         75,000 bp (93.8%)
+
+SRR6805881
+
+=== Summary ===
+
+Total reads processed:                   1,000
+Reads with adapters:                     1,000 (100.0%)
+Reads written (passing filters):         1,000 (100.0%)
+
+Total basepairs processed:        80,000 bp
+Total written (filtered):         75,000 bp (93.8%)
+
+SRR6805882
+
+=== Summary ===
+
+Total reads processed:                   1,000
+Reads with adapters:                     1,000 (100.0%)
+Reads written (passing filters):         1,000 (100.0%)
+
+Total basepairs processed:        80,000 bp
+Total written (filtered):         75,000 bp (93.8%)
+
+SRR6805883
+
+=== Summary ===
+
+Total reads processed:                   1,000
+Reads with adapters:                     1,000 (100.0%)
+Reads written (passing filters):         1,000 (100.0%)
+
+Total basepairs processed:        80,000 bp
+Total written (filtered):         75,000 bp (93.8%)
+
+SRR6805884
+
+=== Summary ===
+
+Total reads processed:                   1,000
+Reads with adapters:                     1,000 (100.0%)
+Reads written (passing filters):         1,000 (100.0%)
+
+Total basepairs processed:        80,000 bp
+Total written (filtered):         75,000 bp (93.8%)
+
+SRR6805885
+
+=== Summary ===
+
+Total reads processed:                   1,000
+Reads with adapters:                     1,000 (100.0%)
+Reads written (passing filters):         1,000 (100.0%)
+
+Total basepairs processed:        80,000 bp
+Total written (filtered):         75,000 bp (93.8%)
+
+$ ls *trimmed*
+SRR6805880.tiny_trimmed.fastq
+SRR6805881.tiny_trimmed.fastq
+SRR6805882.tiny_trimmed.fastq
+SRR6805883.tiny_trimmed.fastq
+SRR6805884.tiny_trimmed.fastq
+SRR6805885.tiny_trimmed.fastq
+
+# Check that trimmed reads no longer all start with TGCAG
+$ grep -c "^TGCAG" SRR6805880.tiny_trimmed.fastq
+1
+
+# Leave the cutadapt environment before using angsd
+$ conda deactivate
+
+# Index the genome with bowtie2-build, then move the six .bt2 files into index/
+$ module load bowtie2
+$ bowtie2-build Ppar_tinygenome.fna Ppar_tinygenome > bowtie2-build.log 2>&1; tail -3 bowtie2-build.log
+Renaming Ppar_tinygenome.2.bt2.tmp to Ppar_tinygenome.2.bt2
+Renaming Ppar_tinygenome.rev.1.bt2.tmp to Ppar_tinygenome.rev.1.bt2
+Renaming Ppar_tinygenome.rev.2.bt2.tmp to Ppar_tinygenome.rev.2.bt2
+$ mkdir index
+$ mv Ppar_tinygenome*.bt2 index/
+$ ls index
+Ppar_tinygenome.1.bt2
+Ppar_tinygenome.2.bt2
+Ppar_tinygenome.3.bt2
+Ppar_tinygenome.4.bt2
+Ppar_tinygenome.rev.1.bt2
+Ppar_tinygenome.rev.2.bt2
+
+# Map the trimmed reads to the genome (single-end), printing the alignment summary for each file
+$ for filename in *.tiny_trimmed.fastq
+do
+  base=$(basename $filename .tiny_trimmed.fastq)
+  echo ${base}
+  bowtie2 -x index/Ppar_tinygenome -U ${base}.tiny_trimmed.fastq -S ${base}.sam
+done
+SRR6805880
+1000 reads; of these:
+  1000 (100.00%) were unpaired; of these:
+    782 (78.20%) aligned 0 times
+    111 (11.10%) aligned exactly 1 time
+    107 (10.70%) aligned >1 times
+21.80% overall alignment rate
+SRR6805881
+1000 reads; of these:
+  1000 (100.00%) were unpaired; of these:
+    782 (78.20%) aligned 0 times
+    109 (10.90%) aligned exactly 1 time
+    109 (10.90%) aligned >1 times
+21.80% overall alignment rate
+SRR6805882
+1000 reads; of these:
+  1000 (100.00%) were unpaired; of these:
+    772 (77.20%) aligned 0 times
+    116 (11.60%) aligned exactly 1 time
+    112 (11.20%) aligned >1 times
+22.80% overall alignment rate
+SRR6805883
+1000 reads; of these:
+  1000 (100.00%) were unpaired; of these:
+    792 (79.20%) aligned 0 times
+    103 (10.30%) aligned exactly 1 time
+    105 (10.50%) aligned >1 times
+20.80% overall alignment rate
+SRR6805884
+1000 reads; of these:
+  1000 (100.00%) were unpaired; of these:
+    789 (78.90%) aligned 0 times
+    110 (11.00%) aligned exactly 1 time
+    101 (10.10%) aligned >1 times
+21.10% overall alignment rate
+SRR6805885
+1000 reads; of these:
+  1000 (100.00%) were unpaired; of these:
+    766 (76.60%) aligned 0 times
+    115 (11.50%) aligned exactly 1 time
+    119 (11.90%) aligned >1 times
+23.40% overall alignment rate
+
+# Peek at one SAM file: header lines (@) then alignments
+$ head -3 SRR6805880.sam | cut -c1-150
+@HD	VN:1.5	SO:unsorted	GO:query
+@SQ	SN:KN893585.1	LN:22606
+@SQ	SN:KN897506.1	LN:3832
+$ grep -v "^@" SRR6805880.sam | head -3 | cut -c1-150
+SRR6805880.2151832	0	KN884176.1	36159	0	28M1I32M1I13M	*	0	0	AAGGCATGACCTTACCTACTGAATAAAAGATGAGACACCTTCTCATTGGCCAAGAAGAAACAACACTCTATTACA	75<59999995:6;
+SRR6805880.576388	4	*	0	0	*	*	0	0	TCGTAATCTAGGAACACACCTACGGGATTATTTACTATTTTACAATCCATAGTCGGAGTCTACAAACAGTTACCA	5878868?;:7474889//+/665628958::2788:>;;
+SRR6805880.501486	4	*	0	0	*	*	0	0	CAAGACCGTAGATCTGTCAAACGCAAAGCTTTAGCGAGCTCTCTAAGTAGCTTGAGAGGTCTGAAGAGAGCAGTG	6758885877766651////,18<=<4;;;<1::;;::65
+
+# Convert each SAM to a sorted BAM with samtools
+$ module load samtools
+$ for filename in *.sam
+do
+  base=$(basename $filename .sam)
+  echo ${base}
+  samtools view -bhS ${base}.sam | samtools sort -o ${base}.bam
+done
+SRR6805880
+SRR6805881
+SRR6805882
+SRR6805883
+SRR6805884
+SRR6805885
+$ ls *.bam
+SRR6805880.bam
+SRR6805881.bam
+SRR6805882.bam
+SRR6805883.bam
+SRR6805884.bam
+SRR6805885.bam
+
+# angsd needs a text file listing the bam files
+$ ls *.bam > bam.filelist
+$ cat bam.filelist
+SRR6805880.bam
+SRR6805881.bam
+SRR6805882.bam
+SRR6805883.bam
+SRR6805884.bam
+SRR6805885.bam
+
+# Activate angsd and compute genotype likelihoods, calling SNPs at p < 1e-2
+$ source activate /courses/BIOL2406.202710/shared/angsd_env
+$ angsd -bam bam.filelist -GL 1 -out genotype_likelihoods -doMaf 2 -SNP_pval 1e-2 -doMajorMinor 1
+	-> angsd version: 0.940-dirty (htslib: 1.24) build(Dec 15 2024 09:11:59)
+	-> angsd -bam bam.filelist -GL 1 -out genotype_likelihoods -doMaf 2 -SNP_pval 1e-2 -doMajorMinor 1 
+	-> Inputtype is BAM/CRAM
+[multiReader] 6 samples in 6 input files
+	-> SNP-filter using a pvalue: 1.000000e-02 correspond to 6.634897 likelihood units
+	-> Parsing 6 number of samples 
+No data for chromoId=0 chromoname=KN893585.1
+This could either indicate that there really is no data for this chromosome
+Or it could be problem with this program regSize=0 notDone=6
+	-> Printing at chr: KN885472.1 pos:10691 chunknumber 100 contains 448 sites
+	-> Printing at chr: JXUT01148291.1 pos:1939 chunknumber 200 contains 73 sites
+	-> Printing at chr: KN896166.1 pos:9953 chunknumber 300 contains 74 sites
+	-> Printing at chr: KN884976.1 pos:46465 chunknumber 400 contains 150 sites
+	-> Printing at chr: KN886318.1 pos:10526 chunknumber 500 contains 75 sites
+
+	-> Done reading data waiting for calculations to finish
+	-> Done waiting for threads
+	-> Output filenames:
+		->"genotype_likelihoods.arg"
+		->"genotype_likelihoods.mafs.gz"
+	-> Sun Oct 18 16:23:42 2026
+	-> Arguments and parameters for all analysis are located in .arg file
+	-> Total number of sites analyzed: 71450
+	-> Number of sites retained after filtering: 9 
+	[ALL done] cpu-time used =  1.00 sec
+	[ALL done] walltime used =  1.00 sec
+$ ls genotype_likelihoods*
+genotype_likelihoods.arg
+genotype_likelihoods.mafs.gz
+
+# Look at the minor allele frequency file and count the SNPs it contains (lines minus the header)
+$ zcat genotype_likelihoods.mafs.gz | head -5
+chromo	position	major	minor	unknownEM	pu-EM	nInd
+KN882277.1	41498	G	T	0.332737	3.127339e-03	3
+KN885472.1	10712	C	G	0.126253	1.118604e-03	6
+KN885472.1	10741	T	A	0.205533	2.729806e-03	6
+KN885472.1	10746	C	T	0.113382	1.394211e-03	6
+$ echo "SNPs at p<1e-2: $(( $(zcat genotype_likelihoods.mafs.gz | wc -l) - 1 ))"
+SNPs at p<1e-2: 9
+
+# ===== EXERCISE 1: map the untrimmed reads and compare alignment rates =====
+$ conda deactivate
+$ module load bowtie2
+$ mkdir -p ex1_untrimmed
+$ for filename in *.tiny.fastq
+do
+  base=$(basename $filename .tiny.fastq)
+  echo ${base}
+  bowtie2 -x index/Ppar_tinygenome -U ${base}.tiny.fastq -S ex1_untrimmed/${base}.sam
+done
+SRR6805880
+1000 reads; of these:
+  1000 (100.00%) were unpaired; of these:
+    780 (78.00%) aligned 0 times
+    111 (11.10%) aligned exactly 1 time
+    109 (10.90%) aligned >1 times
+22.00% overall alignment rate
+SRR6805881
+1000 reads; of these:
+  1000 (100.00%) were unpaired; of these:
+    787 (78.70%) aligned 0 times
+    101 (10.10%) aligned exactly 1 time
+    112 (11.20%) aligned >1 times
+21.30% overall alignment rate
+SRR6805882
+1000 reads; of these:
+  1000 (100.00%) were unpaired; of these:
+    777 (77.70%) aligned 0 times
+    105 (10.50%) aligned exactly 1 time
+    118 (11.80%) aligned >1 times
+22.30% overall alignment rate
+SRR6805883
+1000 reads; of these:
+  1000 (100.00%) were unpaired; of these:
+    787 (78.70%) aligned 0 times
+    104 (10.40%) aligned exactly 1 time
+    109 (10.90%) aligned >1 times
+21.30% overall alignment rate
+SRR6805884
+1000 reads; of these:
+  1000 (100.00%) were unpaired; of these:
+    788 (78.80%) aligned 0 times
+    110 (11.00%) aligned exactly 1 time
+    102 (10.20%) aligned >1 times
+21.20% overall alignment rate
+SRR6805885
+1000 reads; of these:
+  1000 (100.00%) were unpaired; of these:
+    769 (76.90%) aligned 0 times
+    120 (12.00%) aligned exactly 1 time
+    111 (11.10%) aligned >1 times
+23.10% overall alignment rate
+
+# ===== EXERCISE 2: trim to 70 bp (after removing the adapter) and map =====
+$ source activate /courses/BIOL2406.202710/shared/cutadapt_env
+$ mkdir -p ex2_trim70
+$ for filename in *.tiny.fastq
+do
+  base=$(basename $filename .tiny.fastq)
+  echo ${base}
+  cutadapt -g TGCAG -l 70 ${base}.tiny.fastq -o ex2_trim70/${base}.tiny_trimmed70.fastq
+done
+SRR6805880
+
+=== Summary ===
+
+Total reads processed:                   1,000
+Reads with adapters:                     1,000 (100.0%)
+Reads written (passing filters):         1,000 (100.0%)
+
+Total basepairs processed:        80,000 bp
+Total written (filtered):         70,000 bp (87.5%)
+
+SRR6805881
+
+=== Summary ===
+
+Total reads processed:                   1,000
+Reads with adapters:                     1,000 (100.0%)
+Reads written (passing filters):         1,000 (100.0%)
+
+Total basepairs processed:        80,000 bp
+Total written (filtered):         70,000 bp (87.5%)
+
+SRR6805882
+
+=== Summary ===
+
+Total reads processed:                   1,000
+Reads with adapters:                     1,000 (100.0%)
+Reads written (passing filters):         1,000 (100.0%)
+
+Total basepairs processed:        80,000 bp
+Total written (filtered):         70,000 bp (87.5%)
+
+SRR6805883
+
+=== Summary ===
+
+Total reads processed:                   1,000
+Reads with adapters:                     1,000 (100.0%)
+Reads written (passing filters):         1,000 (100.0%)
+
+Total basepairs processed:        80,000 bp
+Total written (filtered):         70,000 bp (87.5%)
+
+SRR6805884
+
+=== Summary ===
+
+Total reads processed:                   1,000
+Reads with adapters:                     1,000 (100.0%)
+Reads written (passing filters):         1,000 (100.0%)
+
+Total basepairs processed:        80,000 bp
+Total written (filtered):         70,000 bp (87.5%)
+
+SRR6805885
+
+=== Summary ===
+
+Total reads processed:                   1,000
+Reads with adapters:                     1,000 (100.0%)
+Reads written (passing filters):         1,000 (100.0%)
+
+Total basepairs processed:        80,000 bp
+Total written (filtered):         70,000 bp (87.5%)
+
+$ conda deactivate
+$ for filename in ex2_trim70/*.fastq
+do
+  base=$(basename $filename .tiny_trimmed70.fastq)
+  echo ${base}
+  bowtie2 -x index/Ppar_tinygenome -U ex2_trim70/${base}.tiny_trimmed70.fastq -S ex2_trim70/${base}.sam
+done
+SRR6805880
+1000 reads; of these:
+  1000 (100.00%) were unpaired; of these:
+    789 (78.90%) aligned 0 times
+    108 (10.80%) aligned exactly 1 time
+    103 (10.30%) aligned >1 times
+21.10% overall alignment rate
+SRR6805881
+1000 reads; of these:
+  1000 (100.00%) were unpaired; of these:
+    788 (78.80%) aligned 0 times
+    104 (10.40%) aligned exactly 1 time
+    108 (10.80%) aligned >1 times
+21.20% overall alignment rate
+SRR6805882
+1000 reads; of these:
+  1000 (100.00%) were unpaired; of these:
+    774 (77.40%) aligned 0 times
+    116 (11.60%) aligned exactly 1 time
+    110 (11.00%) aligned >1 times
+22.60% overall alignment rate
+SRR6805883
+1000 reads; of these:
+  1000 (100.00%) were unpaired; of these:
+    795 (79.50%) aligned 0 times
+    104 (10.40%) aligned exactly 1 time
+    101 (10.10%) aligned >1 times
+20.50% overall alignment rate
+SRR6805884
+1000 reads; of these:
+  1000 (100.00%) were unpaired; of these:
+    795 (79.50%) aligned 0 times
+    109 (10.90%) aligned exactly 1 time
+    96 (9.60%) aligned >1 times
+20.50% overall alignment rate
+SRR6805885
+1000 reads; of these:
+  1000 (100.00%) were unpaired; of these:
+    774 (77.40%) aligned 0 times
+    112 (11.20%) aligned exactly 1 time
+    114 (11.40%) aligned >1 times
+22.60% overall alignment rate
+
+# ===== EXERCISE 3: vary the angsd SNP p-value =====
+$ module load samtools
+$ source activate /courses/BIOL2406.202710/shared/angsd_env
+$ for p in 1e-1 1e-4 1e-6
+do
+  angsd -bam bam.filelist -GL 1 -out gl_p${p} -doMaf 2 -SNP_pval ${p} -doMajorMinor 1 > /dev/null 2>&1
+  echo "p=${p}: $(( $(zcat gl_p${p}.mafs.gz | wc -l) - 1 )) SNPs"
+done
+p=1e-1: 54 SNPs
+p=1e-4: 0 SNPs
+p=1e-6: 0 SNPs
+p=1e-2 (original): 9 SNPs
+
+# DONE

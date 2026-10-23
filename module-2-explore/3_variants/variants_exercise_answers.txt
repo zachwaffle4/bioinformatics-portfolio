@@ -1,0 +1,40 @@
+In-class exercises: variants tutorial (sea cucumber, 6 individuals, 1,000 reads each)
+Commands and output are in variants_session.txt.
+
+1. Map the untrimmed files to the genome. How do the alignments compare?
+
+   Overall alignment rate per file (SRR6805880 ... SRR6805885):
+     untrimmed:                22.0, 21.3, 22.3, 21.3, 21.2, 23.1 %   (mean 21.9 %)
+     trimmed (TGCAG removed):  21.8, 21.8, 22.8, 20.8, 21.1, 23.4 %   (mean 21.95 %)
+
+   The alignments are essentially the same. Trimming helps in three files and hurts in three, by at most 0.5
+   percentage points, which is within what you would expect from noise with only 1,000 reads per file. Every read
+   starts with TGCAG, which is probably the restriction-enzyme cut site (PstI: CTGCAG) from the library prep. If so,
+   those 5 bases are real genome sequence and not an adapter, which would explain why removing them changes
+   almost nothing. (This is my interpretation; I did not check it against the genome.) The low overall rate
+   (~21 %) is expected because the genome and reads were subsampled separately.
+
+2. Trim to 70 bp, map, and compare to the first trimmed reads.
+
+   Command: cutadapt -g TGCAG -l 70  (removes the 5-prime TGCAG, then keeps the first 70 bases of what is left;
+   80 bp reads -> 75 bp after adapter removal -> 70 bp)
+
+   Overall alignment rate per file:
+     trimmed to 70 bp:         21.1, 21.2, 22.6, 20.5, 20.5, 22.6 %   (mean 21.4 %)
+     adapter-trimmed only:     21.8, 21.8, 22.8, 20.8, 21.1, 23.4 %   (mean 21.95 %)
+
+   Trimming to 70 bp gives a slightly lower alignment rate in all six files (0.1 to 0.7 points lower). Shorter reads
+   carry less sequence to anchor the alignment, so a few reads that aligned at 75 bp no longer do.
+
+3. Change the angsd SNP p-value. How many more/less SNPs do we recover?
+
+     SNP p-value    SNPs
+     1e-1           54       (raised: more SNPs)
+     1e-2            9       (the tutorial's value)
+     1e-4            0       (lowered: fewer SNPs)
+     1e-6            0
+
+   Raising the p-value (less strict) recovers more SNPs; lowering it (more strict) recovers fewer, and none pass at
+   1e-4 or below. With only 6 individuals and 1,000 reads each, mapped at ~21 %, there is very little coverage per
+   site, so there is little statistical power to call a variant at a strict threshold. Two other p-values tried
+   for the submission: 1e-1 (54 SNPs) and 1e-4 (0 SNPs); 1e-6 also gave 0.

@@ -1,0 +1,64 @@
+	/courses/BIOL2406.202710/shared/star_env/bin/STAR-avx2 --genomeDir /courses/BIOL2406.202710/students/harel.z/inclass/genomes/rnaseq/star_genome_dir --readFilesIn /courses/BIOL2406.202710/students/harel.z/inclass/genomes/rnaseq/fastq_files/SRR1039508_1.fastq /courses/BIOL2406.202710/students/harel.z/inclass/genomes/rnaseq/fastq_files/SRR1039508_2.fastq --runThreadN 16 --outFileNamePrefix /courses/BIOL2406.202710/students/harel.z/inclass/genomes/rnaseq/star_align_out/SRR1039508_ --outSAMtype BAM SortedByCoordinate --limitBAMsortRAM 40000000000
+	STAR version: 2.7.11b   compiled: 2025-11-14T12:06:42+0000 :/opt/conda/conda-bld/star_1763121846936/work/source
+Oct 22 20:58:38 ..... started STAR run
+Oct 22 20:58:38 ..... loading genome
+Oct 22 20:59:18 ..... started mapping
+Oct 22 21:00:37 ..... finished mapping
+Oct 22 21:00:40 ..... started sorting BAM
+Oct 22 21:01:06 ..... finished successfully
+	/courses/BIOL2406.202710/shared/star_env/bin/STAR-avx2 --genomeDir /courses/BIOL2406.202710/students/harel.z/inclass/genomes/rnaseq/star_genome_dir --readFilesIn /courses/BIOL2406.202710/students/harel.z/inclass/genomes/rnaseq/fastq_files/SRR1039509_1.fastq /courses/BIOL2406.202710/students/harel.z/inclass/genomes/rnaseq/fastq_files/SRR1039509_2.fastq --runThreadN 16 --outFileNamePrefix /courses/BIOL2406.202710/students/harel.z/inclass/genomes/rnaseq/star_align_out/SRR1039509_ --outSAMtype BAM SortedByCoordinate --limitBAMsortRAM 40000000000
+	STAR version: 2.7.11b   compiled: 2025-11-14T12:06:42+0000 :/opt/conda/conda-bld/star_1763121846936/work/source
+Oct 22 21:01:07 ..... started STAR run
+Oct 22 21:01:07 ..... loading genome
+Oct 22 21:01:18 ..... started mapping
+Oct 22 21:02:33 ..... finished mapping
+Oct 22 21:02:37 ..... started sorting BAM
+Oct 22 21:02:59 ..... finished successfully
+	/courses/BIOL2406.202710/shared/star_env/bin/STAR-avx2 --genomeDir /courses/BIOL2406.202710/students/harel.z/inclass/genomes/rnaseq/star_genome_dir --readFilesIn /courses/BIOL2406.202710/students/harel.z/inclass/genomes/rnaseq/fastq_files/SRR1039512_1.fastq /courses/BIOL2406.202710/students/harel.z/inclass/genomes/rnaseq/fastq_files/SRR1039512_2.fastq --runThreadN 16 --outFileNamePrefix /courses/BIOL2406.202710/students/harel.z/inclass/genomes/rnaseq/star_align_out/SRR1039512_ --outSAMtype BAM SortedByCoordinate --limitBAMsortRAM 40000000000
+	STAR version: 2.7.11b   compiled: 2025-11-14T12:06:42+0000 :/opt/conda/conda-bld/star_1763121846936/work/source
+Oct 22 21:03:01 ..... started STAR run
+Oct 22 21:03:01 ..... loading genome
+Oct 22 21:03:11 ..... started mapping
+Oct 22 21:05:12 ..... finished mapping
+Oct 22 21:05:18 ..... started sorting BAM
+Oct 22 21:05:53 ..... finished successfully
+	/courses/BIOL2406.202710/shared/star_env/bin/STAR-avx2 --genomeDir /courses/BIOL2406.202710/students/harel.z/inclass/genomes/rnaseq/star_genome_dir --readFilesIn /courses/BIOL2406.202710/students/harel.z/inclass/genomes/rnaseq/fastq_files/SRR1039513_1.fastq /courses/BIOL2406.202710/students/harel.z/inclass/genomes/rnaseq/fastq_files/SRR1039513_2.fastq --runThreadN 16 --outFileNamePrefix /courses/BIOL2406.202710/students/harel.z/inclass/genomes/rnaseq/star_align_out/SRR1039513_ --outSAMtype BAM SortedByCoordinate --limitBAMsortRAM 40000000000
+	STAR version: 2.7.11b   compiled: 2025-11-14T12:06:42+0000 :/opt/conda/conda-bld/star_1763121846936/work/source
+Oct 22 21:05:55 ..... started STAR run
+Oct 22 21:05:55 ..... loading genome
+Oct 22 21:06:05 ..... started mapping
+Oct 22 21:07:06 ..... finished mapping
+Oct 22 21:07:10 ..... started sorting BAM
+Oct 22 21:07:30 ..... finished successfully
+	/courses/BIOL2406.202710/shared/star_env/bin/STAR-avx2 --genomeDir /courses/BIOL2406.202710/students/harel.z/inclass/genomes/rnaseq/star_genome_dir --readFilesIn /courses/BIOL2406.202710/students/harel.z/inclass/genomes/rnaseq/fastq_files/SRR1039516_1.fastq /courses/BIOL2406.202710/students/harel.z/inclass/genomes/rnaseq/fastq_files/SRR1039516_2.fastq --runThreadN 16 --outFileNamePrefix /courses/BIOL2406.202710/students/harel.z/inclass/genomes/rnaseq/star_align_out/SRR1039516_ --outSAMtype BAM SortedByCoordinate --limitBAMsortRAM 40000000000
+	STAR version: 2.7.11b   compiled: 2025-11-14T12:06:42+0000 :/opt/conda/conda-bld/star_1763121846936/work/source
+Oct 22 21:07:31 ..... started STAR run
+Oct 22 21:07:31 ..... loading genome
+Oct 22 21:07:42 ..... started mapping
+Oct 22 21:09:41 ..... finished mapping
+Oct 22 21:09:44 ..... started sorting BAM
+Oct 22 21:10:14 ..... finished successfully
+	/courses/BIOL2406.202710/shared/star_env/bin/STAR-avx2 --genomeDir /courses/BIOL2406.202710/students/harel.z/inclass/genomes/rnaseq/star_genome_dir --readFilesIn /courses/BIOL2406.202710/students/harel.z/inclass/genomes/rnaseq/fastq_files/SRR1039517_1.fastq /courses/BIOL2406.202710/students/harel.z/inclass/genomes/rnaseq/fastq_files/SRR1039517_2.fastq --runThreadN 16 --outFileNamePrefix /courses/BIOL2406.202710/students/harel.z/inclass/genomes/rnaseq/star_align_out/SRR1039517_ --outSAMtype BAM SortedByCoordinate --limitBAMsortRAM 40000000000
+	STAR version: 2.7.11b   compiled: 2025-11-14T12:06:42+0000 :/opt/conda/conda-bld/star_1763121846936/work/source
+Oct 22 21:10:15 ..... started STAR run
+Oct 22 21:10:15 ..... loading genome
+Oct 22 21:10:27 ..... started mapping
+Oct 22 21:13:11 ..... finished mapping
+Oct 22 21:13:14 ..... started sorting BAM
+Oct 22 21:13:58 ..... finished successfully
+	/courses/BIOL2406.202710/shared/star_env/bin/STAR-avx2 --genomeDir /courses/BIOL2406.202710/students/harel.z/inclass/genomes/rnaseq/star_genome_dir --readFilesIn /courses/BIOL2406.202710/students/harel.z/inclass/genomes/rnaseq/fastq_files/SRR1039520_1.fastq /courses/BIOL2406.202710/students/harel.z/inclass/genomes/rnaseq/fastq_files/SRR1039520_2.fastq --runThreadN 16 --outFileNamePrefix /courses/BIOL2406.202710/students/harel.z/inclass/genomes/rnaseq/star_align_out/SRR1039520_ --outSAMtype BAM SortedByCoordinate --limitBAMsortRAM 40000000000
+	STAR version: 2.7.11b   compiled: 2025-11-14T12:06:42+0000 :/opt/conda/conda-bld/star_1763121846936/work/source
+Oct 22 21:14:00 ..... started STAR run
+Oct 22 21:14:00 ..... loading genome
+Oct 22 21:14:11 ..... started mapping
+Oct 22 21:15:50 ..... finished mapping
+Oct 22 21:15:57 ..... started sorting BAM
+Oct 22 21:16:26 ..... finished successfully
+	/courses/BIOL2406.202710/shared/star_env/bin/STAR-avx2 --genomeDir /courses/BIOL2406.202710/students/harel.z/inclass/genomes/rnaseq/star_genome_dir --readFilesIn /courses/BIOL2406.202710/students/harel.z/inclass/genomes/rnaseq/fastq_files/SRR1039521_1.fastq /courses/BIOL2406.202710/students/harel.z/inclass/genomes/rnaseq/fastq_files/SRR1039521_2.fastq --runThreadN 16 --outFileNamePrefix /courses/BIOL2406.202710/students/harel.z/inclass/genomes/rnaseq/star_align_out/SRR1039521_ --outSAMtype BAM SortedByCoordinate --limitBAMsortRAM 40000000000
+	STAR version: 2.7.11b   compiled: 2025-11-14T12:06:42+0000 :/opt/conda/conda-bld/star_1763121846936/work/source
+Oct 22 21:16:29 ..... started STAR run
+Oct 22 21:16:29 ..... loading genome
+Oct 22 21:16:39 ..... started mapping
+Oct 22 21:18:19 ..... finished mapping
+Oct 22 21:18:23 ..... started sorting BAM
+Oct 22 21:18:55 ..... finished successfully

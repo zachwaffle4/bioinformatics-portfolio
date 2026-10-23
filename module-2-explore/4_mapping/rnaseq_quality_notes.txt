@@ -1,0 +1,52 @@
+General impressions of the FastQC quality reports
+RNA-seq reads from GEO GSE52778 (human airway smooth muscle cells, untreated and treated), 8 paired-end runs.
+FastQC 0.12.1 was run on three of the 16 read files: SRR1039509_1, SRR1039509_2 and SRR1039516_1.
+Reports are in qc/.
+
+Overall: the reads are good quality and I would not trim them.
+
+What the three files have in common
+- 63 bp reads, no variation in length, ~49 % GC, Sanger/Illumina 1.9 quality encoding
+- 21.2 million reads (SRR1039509) and 27.3 million reads (SRR1039516)
+- 0 reads flagged as poor quality in any file
+- Per base sequence quality, per sequence quality, per base sequence content, per sequence GC content, and adapter
+  content all PASS in every file
+
+Warnings and failures, and whether to worry
+
+1. Sequence duplication levels: WARN in SRR1039509_1 and _2, FAIL in SRR1039516_1 (only 44.8 % of reads are
+   distinct there; 50.4 % and 53.6 % in the two SRR1039509 files).
+   Not a concern. In RNA-seq, a small number of highly expressed genes produce most of the reads, so many reads are
+   identical by design. FastQC's duplication check assumes a genome-sequencing library. Reads should NOT be
+   de-duplicated here, because that would erase real expression differences.
+
+2. Per tile sequence quality: WARN in SRR1039509_1, FAIL in SRR1039509_2 (not flagged in SRR1039516_1).
+   Some flowcell tiles had worse quality than the rest of the lane (the first reads in SRR1039508 show runs of N at
+   '#' quality). Mate 2 is worse than mate 1, which is typical because read 2 is sequenced later in the run. Overall
+   quality per base and per sequence still passes, so only a small share of reads is affected. I would note it
+   and move on; aligners handle a few low-quality bases as mismatches.
+
+3. Per base N content: WARN in SRR1039509_2 only. Same cause as above: no-calls at a few positions in a minority of
+   reads. Not enough to need action.
+
+4. Overrepresented sequences: WARN in SRR1039509_1 and _2, PASS in SRR1039516_1.
+   - SRR1039509_1: one TruSeq adapter sequence, 0.86 % of reads.
+   - SRR1039509_2: an Illumina single-end PCR primer sequence, 0.29 % (plus a 1-base variant at 0.11 %).
+   These are leftover library-prep sequences, but in well under 1 % of reads. FastQC's adapter content module
+   passes in every file because it only flags an adapter that reaches 5 % of reads at some position.
+
+Do the reads need trimming?
+No. Adapter content is far below the level where it matters, per base quality is high all the way along the 63 bp
+reads, and the next step is STAR. STAR aligns in local mode and soft-clips bases at the ends of reads that do not
+match the genome, so a few adapter or low-quality bases do not hurt mapping. Trimming 100 GB of FASTQs would take
+hours and is unlikely to change the alignment rates noticeably. If the alignment rates come out low, trimming with
+cutadapt (TruSeq adapter) would be the first thing to try.
+
+Confirmed by the alignment
+The untrimmed reads were aligned with STAR (results/star_mapping_summary.tsv). In all 8 samples, 92.4 to 94.7 % of
+read pairs mapped uniquely (mean 93.9 %), so the leftover adapter, the N bases and the poor tiles did not hurt
+mapping and trimming was not needed.
+
+Limits of this check
+Only 3 of 16 files were examined. The tutorial says the samples were run together and should look alike, and the
+three reports are consistent with that, but the other files were not looked at.

@@ -1,0 +1,63 @@
+# infoseq session: worm and Borrelia genomes
+# Run on Explorer (login node), working directory:
+#   /courses/BIOL2406.202710/students/harel.z/inclass/genomes
+
+$ module load anaconda3/2024.06
+$ source activate /courses/BIOL2406.202710/shared/emboss_env
+$ cd /courses/BIOL2406.202710/students/harel.z/inclass/genomes
+
+$ infoseq C_elegans_genomic.fna
+Display basic information about sequences
+USA                      Database  Name           Accession      Type Length %GC    Organism            Description
+fasta::C_elegans_genomic.fna:NC_003279.8 -              NC_003279.8    -              N    15072434 35.75                      Caenorhabditis elegans chromosome I
+fasta::C_elegans_genomic.fna:NC_003280.10 -              NC_003280.10   -              N    15279421 36.20                      Caenorhabditis elegans chromosome II
+fasta::C_elegans_genomic.fna:NC_003281.10 -              NC_003281.10   -              N    13783801 35.66                      Caenorhabditis elegans chromosome III
+fasta::C_elegans_genomic.fna:NC_003282.8 -              NC_003282.8    -              N    17493829 34.59                      Caenorhabditis elegans chromosome IV
+fasta::C_elegans_genomic.fna:NC_003283.11 -              NC_003283.11   -              N    20924180 35.43                      Caenorhabditis elegans chromosome V
+fasta::C_elegans_genomic.fna:NC_003284.9 -              NC_003284.9    -              N    17718942 35.20                      Caenorhabditis elegans chromosome X
+fasta::C_elegans_genomic.fna:NC_001328.1 -              NC_001328.1    -              N    13794  23.78                      Caenorhabditis elegans mitochondrion, complete genome
+
+$ infoseq B_burgdorferi_genomic.fna
+Display basic information about sequences
+USA                      Database  Name           Accession      Type Length %GC    Organism            Description
+fasta::B_burgdorferi_genomic.fna:NC_001318.1 -              NC_001318.1    -              N    910724 28.60                      Borreliella burgdorferi B31, complete sequence
+fasta::B_burgdorferi_genomic.fna:NC_000957.1 -              NC_000957.1    -              N    5228   23.82                      Borreliella burgdorferi B31 plasmid lp5, complete sequence
+fasta::B_burgdorferi_genomic.fna:NC_001904.1 -              NC_001904.1    -              N    9386   23.69                      Borreliella burgdorferi B31 plasmid cp9, complete sequence
+fasta::B_burgdorferi_genomic.fna:NC_001849.2 -              NC_001849.2    -              N    16821  23.12                      Borreliella burgdorferi B31 plasmid lp17, complete sequence
+fasta::B_burgdorferi_genomic.fna:NC_000955.2 -              NC_000955.2    -              N    18777  20.65                      Borreliella burgdorferi B31 plasmid lp21, complete sequence
+fasta::B_burgdorferi_genomic.fna:NC_001850.1 -              NC_001850.1    -              N    24177  23.36                      Borreliella burgdorferi B31 plasmid lp25, complete sequence
+fasta::B_burgdorferi_genomic.fna:NC_001903.1 -              NC_001903.1    -              N    26498  26.30                      Borreliella burgdorferi B31 plasmid cp26, complete sequence
+fasta::B_burgdorferi_genomic.fna:NC_001851.2 -              NC_001851.2    -              N    28155  32.75                      Borreliella burgdorferi B31 plasmid lp28-1, complete sequence
+fasta::B_burgdorferi_genomic.fna:NC_001852.1 -              NC_001852.1    -              N    29766  31.64                      Borreliella burgdorferi B31 plasmid lp28-2, complete sequence
+fasta::B_burgdorferi_genomic.fna:NC_001853.1 -              NC_001853.1    -              N    28601  25.04                      Borreliella burgdorferi B31 plasmid lp28-3, complete sequence
+fasta::B_burgdorferi_genomic.fna:NC_001854.1 -              NC_001854.1    -              N    27323  24.53                      Borreliella burgdorferi B31 plasmid lp28-4, complete sequence
+fasta::B_burgdorferi_genomic.fna:NC_000948.1 -              NC_000948.1    -              N    30750  29.36                      Borreliella burgdorferi B31 plasmid cp32-1, complete sequence
+fasta::B_burgdorferi_genomic.fna:NC_000949.1 -              NC_000949.1    -              N    30223  28.85                      Borreliella burgdorferi B31 plasmid cp32-3, complete sequence
+fasta::B_burgdorferi_genomic.fna:NC_000950.1 -              NC_000950.1    -              N    30299  29.29                      Borreliella burgdorferi B31 plasmid cp32-4, complete sequence
+fasta::B_burgdorferi_genomic.fna:NC_000951.1 -              NC_000951.1    -              N    29838  29.34                      Borreliella burgdorferi B31 plasmid cp32-6, complete sequence
+fasta::B_burgdorferi_genomic.fna:NC_000952.1 -              NC_000952.1    -              N    30800  29.07                      Borreliella burgdorferi B31 plasmid cp32-7, complete sequence
+fasta::B_burgdorferi_genomic.fna:NC_000953.1 -              NC_000953.1    -              N    30885  29.13                      Borreliella burgdorferi B31 plasmid cp32-8, complete sequence
+fasta::B_burgdorferi_genomic.fna:NC_000954.1 -              NC_000954.1    -              N    30651  29.32                      Borreliella burgdorferi B31 plasmid cp32-9, complete sequence
+fasta::B_burgdorferi_genomic.fna:NC_001855.1 -              NC_001855.1    -              N    36849  26.93                      Borreliella burgdorferi B31 plasmid lp36, complete sequence
+fasta::B_burgdorferi_genomic.fna:NC_001856.1 -              NC_001856.1    -              N    38829  26.07                      Borreliella burgdorferi B31 plasmid lp38, complete sequence
+fasta::B_burgdorferi_genomic.fna:NC_001857.2 -              NC_001857.2    -              N    53657  28.14                      Borreliella burgdorferi B31 plasmid lp54, complete sequence
+fasta::B_burgdorferi_genomic.fna:NC_000956.1 -              NC_000956.1    -              N    52971  27.29                      Borreliella burgdorferi B31 plasmid lp56, complete sequence
+
+# ---------------------------------------------------------------------------
+# Questions and answers
+# ---------------------------------------------------------------------------
+
+# How many sequence files are in the worm genome?
+# 7: chromosomes I, II, III, IV, V, X and the mitochondrion (NC_001328.1).
+
+# How many sequence files are in the Borrelia genome?
+# 22: 1 chromosome (NC_001318.1) and 21 plasmids.
+
+# Which sequence in the worm genome has the lowest GC%?
+# NC_001328.1, the mitochondrion, at 23.78%. The nuclear chromosomes range from 34.59% to 36.20%.
+
+# Which plasmid in Borrelia has the highest GC%? What is interesting about this plasmid?
+# lp28-1 (NC_001851.2), at 32.75%. The next highest is lp28-2 at 31.64%; the chromosome is 28.60%.
+# lp28-1 carries the vls locus (including vlsE), which Borrelia uses for antigenic variation to
+# evade the host immune response. NOTE: this is from memory, not from the output above; verify
+# against NCBI before submitting.

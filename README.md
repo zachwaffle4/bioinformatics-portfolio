@@ -21,3 +21,5 @@ Each folder corresponds to a unit of the course and contains scripts,
 summary results, and documentation of the methods used.
 
 Assignment 1: /MODULE-1-UNIX
+
+Assignment 2: /module-2-explore
