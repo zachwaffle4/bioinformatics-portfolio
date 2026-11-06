@@ -1,0 +1,99 @@
+---
+title: "Exercise 2: Practicing ggplot2"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+Load required libraries, the `msleep` dataset, and set the output directory.
+
+```{r}
+library(ggplot2)
+
+data(msleep)
+
+# output dir
+dir <- file.path("exer_2")
+```
+
+## Question 1: Basic scatterplot with the msleep dataset
+
+Create a scatterplot showing the relationship between `bodywt` (body weight) and `brainwt` (brain weight). Add appropriate axis labels and change the theme to `theme_classic()`.
+
+```{r}
+plot1 <- ggplot(msleep, aes(x=bodywt, y=brainwt)) +
+  geom_point(na.rm=TRUE) +
+  labs(x="Body Weight (kg)", y="Brain Weight (kg)") +
+  theme_classic()
+ggsave(file.path(dir, "plot1.jpeg"), plot1)
+plot1
+```
+
+## Question 2: Adding color by group
+
+Using the same variables from question 1 (`bodywt` and `brainwt`), color the points by `vore` (diet type). Make sure to convert `vore` to a factor. Add a legend title that says "Diet Type".
+
+```{r}
+plot2 <- ggplot(msleep, aes(x=bodywt, y=brainwt)) +
+  geom_point(aes(color=as.factor(vore)), na.rm=TRUE) +
+  labs(x="Body Weight (kg)", y="Brain Weight (kg)", color="Diet Type")
+ggsave(file.path(dir, "plot2.jpeg"), plot2)
+plot2
+```
+
+## Question 3: Scatterplot with a line of best fit
+
+Plot `sleep_total` against `sleep_cycle`. Add a linear regression line using `geom_smooth()`. Color the line red and use `theme_minimal()`.
+
+```{r}
+plot3 <- ggplot(msleep, aes(x=sleep_total, y=sleep_cycle)) +
+  geom_point(na.rm=TRUE) +
+  geom_smooth(method="lm", color="red", se=FALSE, na.rm=TRUE) +
+  labs(x="Sleep Total (hours)", y="Sleep Cycle") +
+  theme_minimal()
+ggsave(file.path(dir, "plot3.jpeg"), plot3)
+plot3
+```
+
+## Question 4: Faceted plots by group
+
+Create a scatterplot of `sleep_total` vs `sleep_rem`. Use `facet_wrap()` to create separate panels for each `vore` type. Add appropriate axis labels.
+
+```{r}
+plot4 <- ggplot(msleep, aes(x=sleep_total, y=sleep_rem)) +
+  geom_point(na.rm=TRUE) +
+  facet_wrap(~vore) +
+  labs(x="Sleep Total (hours)", y="Sleep REM (hours)")
+ggsave(file.path(dir, "plot4.jpeg"), plot4)
+plot4
+```
+
+## Question 5: Exploring a new dataset
+
+Load the built-in `iris` dataset. Create a scatterplot showing `Petal.Length` vs `Petal.Width`. Color points by `Species`. Add a title to your plot using `ggtitle("Iris Petal Dimensions")`. Choose your favorite theme.
+
+```{r}
+data(iris)
+
+plot5 <- ggplot(iris, aes(x=Petal.Length, y=Petal.Width)) +
+  geom_point(aes(color=as.factor(Species)), na.rm=TRUE) +
+  labs(title="Iris Petal Dimensions", x="Petal Length (in)", y="Petal Width (in)", color="Species") +
+  theme_minimal()
+ggsave(file.path(dir, "plot5.jpeg"), plot5)
+plot5
+```
+
+## Bonus Challenge (Optional)
+
+Pick any two continuous variables from the `msleep` dataset and create a publication-quality plot with:
+
+- Appropriate axis labels
+- A theme of your choice
+- Points colored by a grouping variable
+- A descriptive title
+
+```{r}
+
+```

@@ -1,0 +1,214 @@
+# Part 2: The R Environment
+
+## EXERCISE 1.1 # 
+For each exercise set you'll submit an R Markdown script showing commands and output. 
+
+> 01. Open Rstudio and perform an arithmetic calculation in the command line.
+
+```{r}
+6 * 7
+```
+
+
+> 02. Create a numeric vector in the command line containing:
+> + the numbers 2, 9, 3, 8, and 3 and assign this vector to a global variable x. 
+> + Perform arithmetic with x. 
+> + Convince yourself R works as a calculator, and knows order of operations. 
+> + Multiply x by 10, and save the result as a new object named y
+> + Calculate the difference in the sum of the x vector and the sum of the y vector
+
+```{r}
+x <- c(2, 9, 3, 8, 3)
+x * 3
+y <- x * 10
+sum(x) - sum(y)
+```
+
+
+> 03. Call the help files for the functions ls() and rm()
+> + What are the arguments for the ls() function?
+> + What does the 'sorted' argument do? 
+
+```{r}
+args(ls)
+# 'sorted' determines whether the vector of object should be sorted alphabetically
+```
+
+## EXERCISE 1.2 
+Useful commands: dataframename[row , col], str(), dim(), nrow(), unique(), length(), rownames(), summary(), min(), max(), mean(), range(), levels(), factor(), as.factor(), class(), ncol(), nrow(), table(), sum(), quantile(), var()
+
+> We'll use the built-in 'iris' dataset. the command: `data(iris)` # this loads the 'iris' dataset. You can view more information about this dataset with `help(iris)` or `?iris`
+
+> 01. How many rows are in the dataset?
+
+```{r}
+data(iris)
+nrow(iris)
+```
+
+> 02. What are three distinct ways to figure this out? 
+
+```{r}
+#nrows
+#str
+#dim
+```
+
+> 03. How many species of flowers are in the dataset?
+
+
+```{r}
+levels(iris$Species)
+```
+
+> 04. What class is iris?
+
+```{r}
+class(iris)
+```
+
+> 05. How many columns does this data frame have? What are their names?
+
+```{r}
+colnames(iris)
+```
+
+> 06. What class did R assign to each column?
+
+```{r}
+str(iris)
+```
+
+> 07. Assign the first flower's petal's width and length to new objects called setosa1.petalwidth and setosa1.petallength
+
+```{r}
+setosa1.petalwidth <- iris[1,2]
+setosa1.petallength <- iris[1,3]
+```
+
+> 08. Calculate the approximate area of the petal of the first flower, setosa1 (assume petal area can be approximated by a rectangle).
+
+```{r}
+setosa1area2 <- setosa1.petalwidth * setosa1.petallength
+```
+
+> 09. Calculate the petal area of each flower in the iris dataset and assign this to a new column named PetalArea.
+
+```{r}
+iris$PetalArea <- iris$Petal.Length*iris$Petal.Width
+```
+
+> 10. What is the maximum sepal length of the irises?
+
+```{r}
+max(iris$Sepal.Length)
+```
+
+> 11. What is the average sepal length among all flowers in the dataset?
+
+```{r}
+mean(iris$Sepal.Length)
+```
+
+> 12. How about the minimum and median sepal length? 
+
+```{r}
+min(iris$Sepal.Length)
+median(iris$Sepal.Length)
+```
+
+## EXERCISE 1.3 indexing by logical statements
+
+> A few useful commands:  "==", "!=", ">", "<", "&", "|", sum(), which(), table(), !
+> 1. Create your own logical vector with three TRUEs and three FALSEs
+
+```{r}
+lvec = c(TRUE, TRUE, FALSE, FALSE, TRUE, FALSE)
+```
+
+> 2. Produce a vector of the index number of the `TRUE` values
+
+```{r}
+which(lvec)
+```
+
+> 3. Produce a second vector which indexes the numbers of the falses
+
+```{r}
+which(!lvec)
+```
+
+> Go back to the iris dataset, which can be loaded with data(iris)
+> 4. How many irises have sepals less than 5.5 cm?
+
+```{r}
+data(iris)
+sum(iris[,'Sepal.Length']<5.5)
+```
+
+> 5. Which iris individual has the largest petal length? What is the width of it's petal? 
+
+```{r}
+iris[which(iris$Petal.Length == max(iris$Petal.Length)), c('Species', 'Petal.Width')]
+```
+(mmmmm making things complicated)
+
+> 6.  How many of the irises are in this dataset belong to the species versicolor?
+
+```{r}
+sum(iris[,'Species']=='versicolor')
+```
+
+> 7. How many irises have petals longer than 6cm?
+
+```{r}
+sum(iris[,'Petal.Length'] > 6)
+```
+
+> 8. Create a vector of species name for each iris with sepals longer than 6cm.
+
+```{r}
+iris[,'Species'][iris[,'Sepal.Length']>6]
+```
+
+> 9. How many irises have sepals shorter than 5cm, but wider than 3cm?
+
+```{r}
+sum(iris[,'Sepal.Length'] < 5 & iris[,'Sepal.Width'] > 3)
+```
+
+> 10. How many irises have petals narrower than 0.2cm or shorter than 1.5cm?
+
+```{r}
+sum(iris[,'Petal.Width'] < 0.2 | iris[,'Petal.Length'] < 1.5)
+```
+
+> 11. What is the average width of *setosa iris* sepals that are longer than 5cm?
+
+```{r, echo=T}
+mean(iris[,'Sepal.Width'][iris[,'Sepal.Length'] > 5][iris[,'Species']=='setosa'])
+```
+
+> 12. What is the difference between the longest and shortest petal lengths of the species *virginica*?
+
+
+```{r}
+max(iris[,'Petal.Length'][iris[,'Species']=='virginica']) - min(iris[,'Petal.Length'][iris[,'Species']=='virginica'])
+```
+
+> 13. What proportion of flowers in the dataset have petals wider than 1cm?
+
+```{r}
+sum(iris[,'Petal.Width'] > 1 ) / nrow(iris)
+```
+
+> 14. Create a new column within your dataframe, called sepalCategory, and set all values equal to 'long'
+       Subset short values of this column, and set their values to 'short'
+       (Short sepals are those less than 5.5 cm)
+       How many plants with short sepals are there? How many long?
+
+```{r}
+iris[,'sepalCategory'] = 'long'
+iris[,'sepalCategory'][iris[,'Sepal.Length']<5.5] = 'short' 
+table(iris[,'sepalCategory'])
+```

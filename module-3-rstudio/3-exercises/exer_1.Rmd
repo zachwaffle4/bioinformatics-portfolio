@@ -1,0 +1,79 @@
+---
+title: "Exercise 1: Practicing Base R Plotting"
+author: "Zachary Harel"
+date: "11/5/26"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+Load required libraries, the `msleep` dataset, and set the output directory.
+
+```{r}
+library(ggplot2)
+
+data(msleep)
+
+# output dir
+dir <- file.path("exer_1")
+```
+
+## Task 1: Create and customize a scatterplot
+
+Create a scatterplot of `sleep_total` vs `bodywt` (body weight). Customize your plot with:
+
+- A point character (pch) of your choice
+- Blue colored points
+- Axis labels: "Body Weight (kg)" for x-axis and "Total Sleep (hours)" for y-axis
+- A border style of your choice (bty)
+
+```{r}
+scatter <- ggplot(msleep, aes(x = bodywt, y = sleep_total)) +
+  geom_point(color = "blue", shape = 5) +
+  labs(x = "Body Weight (kg)", y = "Total Sleep (hours)") +
+  theme_classic()
+ggsave(file.path(dir, "scatterplot.jpeg"), plot = scatter)
+scatter
+```
+
+## Task 2: Make a histogram
+
+Create a histogram of the `brainwt` (brain weight) variable. Customize your histogram with:
+
+- A color of your choice (col)
+- An appropriate x-axis label
+- A descriptive title using the main argument
+
+```{r}
+hist <- ggplot(msleep, aes(x = brainwt)) +
+  geom_histogram(binwidth = 0.5, fill = "pink", na.rm = TRUE) +
+  labs(x = "Brain Weight (kg)", title = "Brain Weight")
+ggsave(file.path(dir, "histogram.jpeg"), plot = hist)
+hist
+```
+
+## Task 3: Create a boxplot comparing groups
+
+Create a boxplot showing `sleep_total` for each `vore` type (diet). Customize your boxplot with:
+
+- Different colors for each box (hint: use `rainbow()` or choose specific colors)
+- Appropriate axis labels
+- Convert `vore` to a factor using `as.factor()`
+
+```{r}
+box <- ggplot(msleep, aes(x = as.factor(vore), y = sleep_total)) +
+  geom_boxplot(fill = rainbow(length(unique(msleep$vore)))) +
+  labs(x = "Diet", y = "Total Sleep (hours)", title = "Sleep Totals By Diet Type")
+ggsave(file.path(dir, "boxplot.jpeg"), plot = box)
+box
+```
+
+## Bonus Challenge (Optional)
+
+Create a scatterplot of any two continuous variables from `msleep`. Add a line of best fit using `abline()` and `lm()`. Color points based on a condition you define (like we did with `sleep_total >= 17` in the tutorial), and add a legend to explain the colors.
+
+```{r}
+
+```

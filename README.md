@@ -23,3 +23,5 @@ summary results, and documentation of the methods used.
 Assignment 1: /MODULE-1-UNIX
 
 Assignment 2: /module-2-explore
+
+Assignment 3: [/module-3-rstudio](module-3-rstudio/)
