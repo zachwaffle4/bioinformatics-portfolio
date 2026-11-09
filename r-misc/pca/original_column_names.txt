@@ -1,0 +1,8 @@
+bams.SRR1039508_Aligned.sortedByCoord.out.bam
+bams.SRR1039509_Aligned.sortedByCoord.out.bam
+bams.SRR1039512_Aligned.sortedByCoord.out.bam
+bams.SRR1039513_Aligned.sortedByCoord.out.bam
+bams.SRR1039516_Aligned.sortedByCoord.out.bam
+bams.SRR1039517_Aligned.sortedByCoord.out.bam
+bams.SRR1039520_Aligned.sortedByCoord.out.bam
+bams.SRR1039521_Aligned.sortedByCoord.out.bam
