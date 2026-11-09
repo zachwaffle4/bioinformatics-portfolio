@@ -1,0 +1,229 @@
+---
+title: "Setting Up the Airway Dataset for DESeq2"
+dataset: GSE52778
+author: Jaimita
+date: "`r Sys.Date()`"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Goal of this session
+
+The airway experiment measured gene expression in four human airway smooth
+muscle cell lines, each one split into an untreated sample and a sample treated
+with dexamethasone (a glucocorticoid). 
+
+Working on the command line we used sratoolkit to fetch the raw sequencing reads from the GEO db. We then performed the standard sequence of QC-checking with fastqc, indexing the human genome, and mapping the reads to the indexed human genome.
+
+Which program did we use for mapping?
+What are the input files and output files for mapping?
+
+After mapping gave us the genome coordinates for all reads, we used this output as input in generating a counts matrix. 
+
+What was the name of the program we used to make a counts matrix?
+What were the input and output files?
+
+Now we want to:
+
+1. Read the counts table into R
+2. Modify it for our purposes and make it readable
+3. Generate a `DESeqDataSet` object from it
+4. Produce a PCA plot
+
+## Prep: Install (if needed) and load the DESeq2 package (takes a while)
+```{r load-package, message=FALSE}
+library(DESeq2)
+```
+## Have counts.txt available
+
+You'll need the counts matrix you generated (counts.txt) for the next step. Be sure it's available in your working directory. If not, move it there (easiest to do this in terminal). If your counts data were in .csv format, you'd use the command read.csv in place of read.table.
+
+## Read in the counts table
+
+The first column of the file holds Ensembl gene IDs. We want those to become
+**row names**, not a column of data, so we use `row.names = 1`. 
+
+```{r read-counts}
+counts_raw <- read.table(file.path("counts.txt"), row.names = 1, header = TRUE)
+```
+
+### Look at what you read in
+
+Never move forward without looking at the object you just created.
+
+```{r inspect}
+dim(counts_raw)
+colnames(counts_raw)
+```
+
+**Check:** `dim()` prints two numbers, rows then columns. The first should be
+tens of thousands (one row per gene). The second tells you how many samples are
+in the file. For our human airway experiment, we decided to look only at the dex-treated cells for four different cell lines, each matched with an untreated control.
+
+How many samples are in the raw file? How many do we want? Which columns do these correspond to?
+13 samples; we want 8; columns 6-13
+
+
+## Keep only needed columns
+
+Each sample in our table is specified by the SRA accession number that starts with SRR. We want to eliminate the first 5 columns and keep only the remaining 8 sample columns. The brackets indicate we're taking a subset of the data. The comma shows that nothing is done to the row dimension. In the column dimension, we want to keep columns 6 through the total number of columns in the table. In other words, columns 1 through 5 will NOT be kept.
+
+```{r rid-extra-col}
+# Remove columns one through five
+counts_raw <- counts_raw[, 6:ncol(counts_raw)]
+```
+
+DESeq2 needs a second table (coldata) in the form of a data frame, describing the samples. One row per sample, onecolumn per variable. For coldata, the rows will represent the samples in the same order as they appear in the counts table columns. 
+
+Let's retrieve the column names of the counts table to determine the order of the samples. We'll also save these original column names as reference.
+
+```{r}
+# Retrieve column names
+colnames(counts_raw)
+
+# Save the original names for reference
+writeLines(colnames(counts_raw), "original_column_names.txt")
+```
+We have two variables among our samples: which cell line, and whether the sample was treated. Remember that the order of the samples were control/treated pairs, one pair for each cell line. To see which cell lines each pair belongs to, we need to go back to the SRA Run Selector on GEO database and find the names and order of the four cell lines with respect to our samples (note that I recorded the GEO accession number in the title of this R markdown doc).
+
+I find the first pair of samples is cell line N61311, second pair N052611, third pair N080611, and fourth pair N061011. And the first of each pair is the control, the second is treated. So let's give coldata two "factors" -- cell type and dex treatment. 
+
+```{r coldata}
+coldata <- data.frame(
+  cell  = factor(c("N61311", "N61311", "N052611", "N052611",
+                   "N080611", "N080611", "N061011", "N061011")),
+  dex   = factor(c("untrt", "trt", "untrt", "trt",
+                   "untrt", "trt", "untrt", "trt"),
+                 levels = c("untrt", "trt")),
+  
+  row.names = colnames(counts_raw)
+)
+
+coldata
+```
+
+## Generate a DESeq data object
+
+Now we're ready to create the DESeq data object that includes the counts and sample information in the proper format for DGE analysis. The read.table command gave us a data frame. DESeq2 object need the counts to be whole-number integers. Since the numbers in cells represent the number of reads that map to each gene in each sample, they will already be in whole-integer form. So the first step in generating the data object is to convert the counts table to a matrix of integers.
+
+```{r to-matrix}
+counts_matrix <- as.matrix(counts_raw)
+```
+
+Be sure it worked. The command below should give output "numeric":
+```{r}
+mode(counts_matrix)
+```
+
+**Check:** `class()` returns `"matrix"
+```{r}
+class(counts_matrix)
+```
+yup!
+
+### The check that matters most
+
+DESeq2 assumes column *i* of the counts matrix corresponds to row *i* of
+`coldata`. It does not verify this for you. If they are misaligned, the analysis
+runs and produces confident, wrong results.
+
+```{r critical-check}
+all(colnames(counts_matrix) == rownames(coldata))
+```
+
+**Check:** This must print `TRUE`. If it prints `FALSE`, do not continue.
+
+## Set the reference level
+
+R orders factor levels alphabetically by default, which would make `trt` the reference and
+report fold changes as "untreated relative to treated." We want the opposite, so we specifically designate "untrt" as the reference.
+
+```{r factors}
+coldata$dex  <- factor(coldata$dex)
+coldata$cell <- factor(coldata$cell)
+
+coldata$dex <- relevel(coldata$dex, ref = "untrt")
+levels(coldata$dex)
+```
+
+**Check:** `"untrt"` appears first.
+yes!
+
+## Assemble the DESeqDataSet
+
+```{r dds}
+dds <- DESeqDataSetFromMatrix(
+  countData = counts_raw,
+  colData   = coldata,
+  design    = ~ cell + dex
+)
+
+dds
+```
+
+The `design` formula tells DESeq2 which columns of `coldata` to use. Here we
+account for differences between cell lines (`cell`) while testing the effect of
+treatment (`dex`). The variable of interest goes last.
+
+What would happen if you left `cell` out of the formula?
+
+## Remove genes with almost no data
+
+Many genes were detected in none of the samples. They carry no information and
+only slow things down.
+
+```{r filter}
+nrow(dds)
+
+keep_genes <- rowSums(counts(dds)) >= 10
+dds <- dds[keep_genes, ]
+
+nrow(dds)
+```
+
+How many genes were dropped?
+
+## Transform the counts for PCA
+
+PCA assumes variables are on a comparable scale. Raw counts are not: highly
+expressed genes have much larger variance than lightly expressed ones, so a PCA
+on raw counts would reflect little more than which genes are abundant.
+
+The variance stabilizing transformation (vst) puts counts on a log-like scale and
+flattens the relationship between mean and variance.
+
+```{r vst}
+vsd <- vst(dds, blind = TRUE)
+```
+
+`blind = TRUE` tells the transformation to ignore the experimental design, which
+is what you want for an unbiased look at your samples.
+
+## Plot the PCA
+
+```{r pca, fig.width=6, fig.height=4}
+plotPCA(vsd, intgroup = "dex")
+```
+
+And colored by cell line instead:
+
+```{r pca-cell, fig.width=6, fig.height=4}
+plotPCA(vsd, intgroup = "cell")
+```
+
+Which variable separates the samples along PC1, treatment or
+cell line? Which variable separates them along PC2? What does your answer imply about the relative size of the two
+effects? Does the percentage of variance on PC1 tell you whether the experiment
+worked?
+
+Treatment separates the variables along PC1, whereas cell line separates them across PC2 (but only kind of); it looks like the treatment definitely has a larger effect, but there are no significant results yet.
+
+## Finishing up
+
+Knit this document to HTML and confirm that all chunks ran without error. The
+`dds` object you built is the starting point for differential expression
+analysis, which is where we pick up next session.
+

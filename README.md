@@ -17,11 +17,17 @@ introductory bioinformatics course, including:
 
 ## Repository Organization
 
+### Assignments
+
 Each folder corresponds to a unit of the course and contains scripts, 
 summary results, and documentation of the methods used.
 
-Assignment 1: /MODULE-1-UNIX
+Assignment 1: /module-1-unix
 
 Assignment 2: /module-2-explore
 
-Assignment 3: [/module-3-rstudio](module-3-rstudio/)
+Assignment 3: /module-3-rstudio
+
+### Misc
+
+The /r-misc directory contains various R scripts and their required files for in-class work that is not part of the main assignment modules.
